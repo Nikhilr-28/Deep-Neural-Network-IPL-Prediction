@@ -1,0 +1,518 @@
+<!-- Version 1.0.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPL Outcome & Playoff Predictor - UI Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-50 min-h-screen font-sans">
+  <!-- App Shell -->
+  <div class="flex flex-col min-h-screen">
+    <!-- Top Nav -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+        <!-- Logo + Title -->
+        <div class="flex items-center gap-2">
+          <div class="h-8 w-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-xs font-bold tracking-tight">
+            IPL
+          </div>
+          <div>
+            <div class="text-sm font-semibold tracking-tight">Deep IPL Predictor</div>
+            <div class="text-[11px] text-slate-400">Multi-modal win & playoff forecasting</div>
+          </div>
+        </div>
+
+        <!-- Nav Actions -->
+        <div class="flex items-center gap-3 text-xs">
+          <button class="px-3 py-1.5 rounded-full border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-slate-50 transition">
+            Docs
+          </button>
+          <button class="px-3 py-1.5 rounded-full border border-emerald-500 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition">
+            Export Report
+          </button>
+          <div class="h-7 w-px bg-slate-800"></div>
+          <div class="flex items-center gap-2">
+            <div class="h-7 w-7 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-semibold">GN</div>
+            <span class="hidden sm:inline text-[11px] text-slate-400">Gaurav · Analyst</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-4">
+      <!-- Top Row: Match Setup + High-level Probabilities -->
+      <section class="grid lg:grid-cols-3 gap-4">
+        <!-- Match Config Panel -->
+        <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold tracking-tight">Pre-match setup</h2>
+              <p class="text-[11px] text-slate-400 mt-0.5">Select fixture, squads and context for prediction.</p>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 text-[10px] text-emerald-300 font-medium">TabTransformer · TFT · GAT</span>
+          </div>
+
+          <!-- Match selectors -->
+
+<!-- Player Management -->
+<div class="bg-slate-950/40 border border-slate-800 rounded-xl p-3 mt-3 text-xs">
+  <div class="flex items-center justify-between mb-2">
+    <span class="text-slate-300 font-semibold">Squad editor</span>
+    <button class="px-2 py-1 rounded-full bg-emerald-600 text-[10px] text-slate-950 hover:bg-emerald-500">Add Player</button>
+  </div>
+
+  <!-- Team 1 list -->
+  <div class="mb-2">
+    <div class="text-[11px] text-slate-400 mb-1">Team 1 Players</div>
+    <div class="space-y-1">
+      <div class="flex items-center justify-between bg-slate-900 px-2 py-1.5 rounded-lg border border-slate-800">
+        <span class="text-slate-200 text-[11px]">Player Name</span>
+        <div class="flex items-center gap-1">
+          <button class="px-2 py-0.5 text-[10px] border border-slate-700 rounded-full hover:border-slate-500">Edit</button>
+          <button class="px-2 py-0.5 text-[10px] border border-red-700 text-red-300 rounded-full hover:border-red-500">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team 2 list -->
+  <div class="mt-3">
+    <div class="text-[11px] text-slate-400 mb-1">Team 2 Players</div>
+    <div class="space-y-1">
+      <div class="flex items-center justify-between bg-slate-900 px-2 py-1.5 rounded-lg border border-slate-800">
+        <span class="text-slate-200 text-[11px]">Player Name</span>
+        <div class="flex items-center gap-1">
+          <button class="px-2 py-0.5 text-[10px] border border-slate-700 rounded-full hover:border-slate-500">Edit</button>
+          <button class="px-2 py-0.5 text-[10px] border border-red-700 text-red-300 rounded-full hover:border-red-500">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          <div class="grid md:grid-cols-2 gap-3 text-xs mt-1">
+            <div class="space-y-2">
+              <label class="block text-[11px] text-slate-400">League & Season</label>
+              <div class="flex gap-2">
+                <select class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 focus:outline-none focus:border-emerald-500 text-[11px]">
+                  <option>IPL</option>
+                  <option>T20I</option>
+                  <option>BBL</option>
+                  <option>CPL</option>
+                </select>
+                <select class="w-24 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]">
+                  <option>2024</option>
+                  <option>2023</option>
+                  <option>2022</option>
+                </select>
+              </div>
+
+              <label class="block text-[11px] text-slate-400 mt-3">Venue</label>
+              <select class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]">
+                <option>Eden Gardens · Kolkata</option>
+                <option>Chinnaswamy · Bengaluru</option>
+                <option>Wankhede · Mumbai</option>
+                <option>Dharamshala · HPCA</option>
+              </select>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-[11px] text-slate-400">Fixture</label>
+              <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                <select class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]">
+                  <option>KKR</option>
+                  <option>RCB</option>
+                  <option>CSK</option>
+                  <option>MI</option>
+                </select>
+                <span class="text-[11px] text-slate-500 text-center">vs</span>
+                <select class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]">
+                  <option>RCB</option>
+                  <option>KKR</option>
+                  <option>SRH</option>
+                  <option>DC</option>
+                </select>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 mt-3">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Toss</label>
+                  <select class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]">
+                    <option>Not yet</option>
+                    <option>Team 1 won</option>
+                    <option>Team 2 won</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Decision</label>
+                  <select class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]">
+                    <option>Auto (model)</option>
+                    <option>Bat first</option>
+                    <option>Bowl first</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Context sliders -->
+          <div class="grid md:grid-cols-3 gap-3 text-[11px] mt-2">
+            <div class="bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2.5">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-slate-300">Pitch type</span>
+                <span class="text-[10px] text-emerald-300">Auto from history</span>
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-slate-500 mb-1">
+                <span>Spin-friendly</span>
+                <span>Flat</span>
+              </div>
+              <div class="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full w-2/3 bg-gradient-to-r from-emerald-400 to-cyan-400"></div>
+              </div>
+            </div>
+
+            <div class="bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2.5">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-slate-300">Dew likelihood</span>
+                <span class="text-[10px] text-sky-300">Night · Humid</span>
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-slate-500 mb-1">
+                <span>Low</span>
+                <span>High</span>
+              </div>
+              <div class="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full w-4/5 bg-gradient-to-r from-sky-400 to-indigo-400"></div>
+              </div>
+            </div>
+
+            <div class="bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2.5">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-slate-300">Form window</span>
+                <span class="text-[10px] text-slate-400">Last 5 matches</span>
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-slate-500 mb-1">
+                <span>Season avg</span>
+                <span>Recent form</span>
+              </div>
+              <div class="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full w-3/4 bg-gradient-to-r from-amber-400 to-red-400"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3 pt-3 border-t border-slate-800 text-[11px]">
+            <div class="flex items-center gap-2 text-slate-400">
+              <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-800 text-[10px]">i</span>
+              <span>Models: baseline ensemble + TabTransformer + TFT + GAT meta-ensemble.</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="px-3 py-1.5 rounded-full border border-slate-700 text-slate-300 hover:border-slate-500">
+                Reset
+              </button>
+              <button class="px-4 py-1.5 rounded-full bg-emerald-500 text-slate-950 font-medium hover:bg-emerald-400">
+                Run prediction
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Win Probabilities Panel -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3 text-xs">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold tracking-tight">Win probability</h2>
+              <p class="text-[11px] text-slate-400 mt-0.5">Calibrated with Brier score and Platt scaling.</p>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-300">Backtest: 74.1% acc</span>
+          </div>
+
+          <div class="relative mt-1">
+            <div class="h-20 rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex text-[11px]">
+              <div class="flex-1 flex flex-col justify-center items-center bg-gradient-to-r from-emerald-500/20 to-emerald-500/5">
+                <div class="text-[10px] text-emerald-300 uppercase tracking-wide">Team 1 · KKR</div>
+                <div class="text-2xl font-semibold mt-1">68<sup class="text-xs">%</sup></div>
+                <div class="mt-1 text-[10px] text-emerald-200">Favoured · toss pending</div>
+              </div>
+              <div class="w-px bg-slate-800/80"></div>
+              <div class="flex-1 flex flex-col justify-center items-center bg-gradient-to-l from-sky-500/10 to-sky-500/0">
+                <div class="text-[10px] text-sky-300 uppercase tracking-wide">Team 2 · RCB</div>
+                <div class="text-2xl font-semibold mt-1">32<sup class="text-xs">%</sup></div>
+                <div class="mt-1 text-[10px] text-slate-400">Underdog · form improving</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Key drivers list -->
+          <div class="mt-2 space-y-2">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-400">Top drivers (SHAP)</span>
+              <span class="text-slate-500">For this fixture</span>
+            </div>
+            <ul class="space-y-1.5 text-[11px]">
+              <li class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2">
+                <div>
+                  <div class="text-slate-200">Powerplay SR differential</div>
+                  <div class="text-[10px] text-slate-500">KKR +41.2 vs league average</div>
+                </div>
+                <span class="text-emerald-300 font-medium">+0.21</span>
+              </li>
+              <li class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2">
+                <div>
+                  <div class="text-slate-200">Death overs economy (KKR)</div>
+                  <div class="text-[10px] text-slate-500">Starc 7.8 vs league 9.2</div>
+                </div>
+                <span class="text-emerald-300 font-medium">+0.14</span>
+              </li>
+              <li class="flex items-center justify-between bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2">
+                <div>
+                  <div class="text-slate-200">Recent form · Kohli</div>
+                  <div class="text-[10px] text-slate-500">Avg 54.8 last 5 innings</div>
+                </div>
+                <span class="text-red-300 font-medium">-0.09</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Calibration badge -->
+          <div class="mt-2 flex items-center justify-between text-[11px] text-slate-400">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-800 text-[10px]">σ</span>
+              <span>Brier score: 0.18 · Well calibrated on 2024 backtest.</span>
+            </div>
+            <button class="px-2 py-1 rounded-full border border-slate-700 hover:border-slate-500 text-[10px]">View reliability curve</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Middle Row: Momentum & PvP Matchups -->
+      <section class="grid lg:grid-cols-3 gap-4">
+        <!-- Momentum chart placeholder -->
+        <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-xs flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold tracking-tight">Momentum & win probability over overs</h2>
+              <p class="text-[11px] text-slate-400 mt-0.5">Temporal Fusion Transformer · updated every over.</p>
+            </div>
+            <div class="flex items-center gap-2 text-[10px] text-slate-400">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-800"><span class="h-2 w-2 rounded-full bg-emerald-400"></span> KKR</span>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-800"><span class="h-2 w-2 rounded-full bg-sky-400"></span> RCB</span>
+            </div>
+          </div>
+
+          <!-- Fake chart -->
+          <div class="mt-1 bg-slate-950 border border-slate-800 rounded-2xl h-48 flex flex-col justify-between p-3">
+            <div class="flex-1 flex items-end gap-1">
+              <!-- simple spark lines / bars as placeholder -->
+              <div class="flex-1 flex items-end gap-1 opacity-80">
+                <div class="w-1 bg-emerald-500/40 h-6 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/50 h-8 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/60 h-10 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/70 h-16 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/80 h-20 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/70 h-18 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/60 h-15 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/50 h-13 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/60 h-17 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/70 h-22 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/80 h-24 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/70 h-21 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/60 h-18 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/50 h-15 rounded-full"></div>
+                <div class="w-1 bg-emerald-500/40 h-12 rounded-full"></div>
+              </div>
+              <div class="flex-1 flex items-end gap-1 opacity-60">
+                <div class="w-1 bg-sky-500/30 h-12 rounded-full"></div>
+                <div class="w-1 bg-sky-500/40 h-10 rounded-full"></div>
+                <div class="w-1 bg-sky-500/50 h-8 rounded-full"></div>
+                <div class="w-1 bg-sky-500/60 h-12 rounded-full"></div>
+                <div class="w-1 bg-sky-500/70 h-16 rounded-full"></div>
+                <div class="w-1 bg-sky-500/60 h-18 rounded-full"></div>
+                <div class="w-1 bg-sky-500/50 h-20 rounded-full"></div>
+                <div class="w-1 bg-sky-500/40 h-22 rounded-full"></div>
+                <div class="w-1 bg-sky-500/40 h-20 rounded-full"></div>
+                <div class="w-1 bg-sky-500/40 h-18 rounded-full"></div>
+                <div class="w-1 bg-sky-500/40 h-15 rounded-full"></div>
+                <div class="w-1 bg-sky-500/30 h-13 rounded-full"></div>
+                <div class="w-1 bg-sky-500/30 h-11 rounded-full"></div>
+                <div class="w-1 bg-sky-500/30 h-9 rounded-full"></div>
+                <div class="w-1 bg-sky-500/30 h-7 rounded-full"></div>
+              </div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-500 mt-2">
+              <span>Start</span>
+              <span>Over 6</span>
+              <span>Over 10</span>
+              <span>Over 15</span>
+              <span>Over 20</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] text-slate-400 mt-2">
+            <span>Attention peaks around overs 6–8 and 17–19; model flags these as momentum swings.</span>
+            <button class="px-2 py-1 rounded-full border border-slate-700 hover:border-slate-500 text-[10px]">View attention heatmap</button>
+          </div>
+        </div>
+
+        <!-- PvP matchups -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-xs flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold tracking-tight">Key batter vs bowler matchups</h2>
+              <p class="text-[11px] text-slate-400 mt-0.5">Graph Attention Network · chemistry and history.</p>
+            </div>
+            <button class="px-2 py-1 rounded-full border border-slate-700 hover:border-slate-500 text-[10px]">Swap perspective</button>
+          </div>
+
+          <div class="space-y-2 mt-1">
+            <div class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 flex items-center justify-between">
+              <div>
+                <div class="text-slate-200 text-[11px]">Phil Salt vs Mohammed Siraj</div>
+                <div class="text-[10px] text-slate-500 mt-0.5">38 runs · 14 balls · 0 dismissals · SR 271.4</div>
+                <div class="mt-0.5 inline-flex items-center gap-1 text-[10px] text-emerald-300">
+                  <span class="h-1.5 w-10 rounded-full bg-emerald-400/60"></span>
+                  Strong edge · deploy in powerplay
+                </div>
+              </div>
+              <span class="text-emerald-300 text-[11px] font-semibold">+0.18 win Δ</span>
+            </div>
+
+            <div class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 flex items-center justify-between">
+              <div>
+                <div class="text-slate-200 text-[11px]">Virat Kohli vs Mitchell Starc</div>
+                <div class="text-[10px] text-slate-500 mt-0.5">62 runs · 45 balls · 3 dismissals · SR 137.8</div>
+                <div class="mt-0.5 inline-flex items-center gap-1 text-[10px] text-amber-300">
+                  <span class="h-1.5 w-6 rounded-full bg-amber-400/60"></span>
+                  Even contest · avoid death overs
+                </div>
+              </div>
+              <span class="text-slate-200 text-[11px] font-semibold">±0.00</span>
+            </div>
+
+            <div class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 flex items-center justify-between">
+              <div>
+                <div class="text-slate-200 text-[11px]">Sunil Narine vs Karn Sharma</div>
+                <div class="text-[10px] text-slate-500 mt-0.5">54 runs · 23 balls · 1 dismissal · SR 234.8</div>
+                <div class="mt-0.5 inline-flex items-center gap-1 text-[10px] text-emerald-300">
+                  <span class="h-1.5 w-8 rounded-full bg-emerald-400/60"></span>
+                  Favour Narine · shield with pace
+                </div>
+              </div>
+              <span class="text-emerald-300 text-[11px] font-semibold">+0.11 win Δ</span>
+            </div>
+          </div>
+
+          <div class="mt-2 flex items-center justify-between text-[11px] text-slate-400">
+            <span>Edges integrated into player OVR and team selection suggestions.</span>
+            <button class="px-2 py-1 rounded-full border border-slate-700 hover:border-slate-500 text-[10px]">View full matchup graph</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Row: Playoff Forecasts + Model Log -->
+      <section class="grid lg:grid-cols-3 gap-4 pb-6">
+        <!-- Playoff projection table -->
+        <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-xs flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold tracking-tight">Season playoff projections</h2>
+              <p class="text-[11px] text-slate-400 mt-0.5">Simulated from full schedule using dynamic OVR.</p>
+            </div>
+            <button class="px-3 py-1.5 rounded-full border border-slate-700 hover:border-slate-500 text-[10px]">Run 10K simulations</button>
+          </div>
+
+          <div class="mt-1 bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden">
+            <table class="min-w-full text-[11px]">
+              <thead class="bg-slate-900/80">
+                <tr class="text-slate-400 text-left">
+                  <th class="px-3 py-2 font-medium">Team</th>
+                  <th class="px-3 py-2 font-medium">Playoff %</th>
+                  <th class="px-3 py-2 font-medium">Top 2 %</th>
+                  <th class="px-3 py-2 font-medium">Title %</th>
+                  <th class="px-3 py-2 font-medium">Key drivers</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-t border-slate-800 bg-emerald-500/5">
+                  <td class="px-3 py-2 font-semibold text-slate-50">KKR</td>
+                  <td class="px-3 py-2 text-emerald-300 font-medium">91.2%</td>
+                  <td class="px-3 py-2 text-emerald-200">72.4%</td>
+                  <td class="px-3 py-2 text-emerald-200">31.7%</td>
+                  <td class="px-3 py-2 text-slate-400">Powerplay SR, death bowling, venue cluster fit</td>
+                </tr>
+                <tr class="border-t border-slate-800">
+                  <td class="px-3 py-2 font-semibold text-slate-50">RCB</td>
+                  <td class="px-3 py-2 text-emerald-200">64.5%</td>
+                  <td class="px-3 py-2 text-slate-300">38.2%</td>
+                  <td class="px-3 py-2 text-slate-300">12.9%</td>
+                  <td class="px-3 py-2 text-slate-400">Top-heavy batting, high variance bowling</td>
+                </tr>
+                <tr class="border-t border-slate-800">
+                  <td class="px-3 py-2 font-semibold text-slate-50">SRH</td>
+                  <td class="px-3 py-2 text-emerald-200">58.3%</td>
+                  <td class="px-3 py-2 text-slate-300">29.7%</td>
+                  <td class="px-3 py-2 text-slate-300">10.4%</td>
+                  <td class="px-3 py-2 text-slate-400">Explosive batting, thin bench depth</td>
+                </tr>
+                <tr class="border-t border-slate-800">
+                  <td class="px-3 py-2 font-semibold text-slate-50">DC</td>
+                  <td class="px-3 py-2 text-emerald-200">52.1%</td>
+                  <td class="px-3 py-2 text-slate-300">21.9%</td>
+                  <td class="px-3 py-2 text-slate-300">7.3%</td>
+                  <td class="px-3 py-2 text-slate-400">Balanced roster, moderate variance</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-2 flex items-center justify-between text-[11px] text-slate-400">
+            <span>Calibrated to 2022–2023 seasons; identified 3/4 actual 2024 playoff teams in backtest.</span>
+            <button class="px-2 py-1 rounded-full border border-slate-700 hover:border-slate-500 text-[10px]">Download CSV</button>
+          </div>
+        </div>
+
+        <!-- Model run log / explanation chat -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-xs flex flex-col gap-3 max-h-[320px]">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold tracking-tight">Explanation console</h2>
+              <p class="text-[11px] text-slate-400 mt-0.5">Ask why the model predicted this outcome.</p>
+            </div>
+          </div>
+
+          <div class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-3 flex flex-col gap-2 overflow-y-auto">
+            <!-- Example messages -->
+            <div class="self-start max-w-[90%] bg-slate-900 rounded-2xl rounded-bl-sm px-3 py-2">
+              <p class="text-[11px] text-slate-100">Why is KKR so heavily favoured here?</p>
+              <p class="text-[10px] text-slate-500 mt-1">User · 2s ago</p>
+            </div>
+
+            <div class="self-end max-w-[90%] bg-emerald-500/10 border border-emerald-500/40 rounded-2xl rounded-br-sm px-3 py-2">
+              <p class="text-[11px] text-slate-100">Three main factors: (1) powerplay SR advantage of +41.2 vs league, (2) death overs economy 1.4 runs better than RCB, (3) venue cluster similar to grounds where KKR has a 78% historical win rate.</p>
+              <p class="text-[10px] text-emerald-200 mt-1">Model explainer · 1s ago</p>
+            </div>
+
+            <div class="self-start max-w-[90%] bg-slate-900 rounded-2xl rounded-bl-sm px-3 py-2">
+              <p class="text-[11px] text-slate-100">How sensitive is this to Kohli’s form?</p>
+              <p class="text-[10px] text-slate-500 mt-1">User · now</p>
+            </div>
+
+            <div class="self-end max-w-[90%] bg-emerald-500/10 border border-emerald-500/40 rounded-2xl rounded-br-sm px-3 py-2">
+              <p class="text-[11px] text-slate-100">If we revert Kohli to his early-season form window, KKR win probability increases from 68% → 74%. Dynamic OVR contributes ~3.1% swing alone.</p>
+              <p class="text-[10px] text-emerald-200 mt-1">Model explainer · now</p>
+            </div>
+          </div>
+
+          <!-- Input -->
+          <div class="mt-2 flex items-center gap-2">
+            <input type="text" placeholder="Ask about SHAP, attention, or OVR impact..." class="flex-1 bg-slate-950 border border-slate-800 rounded-full px-3 py-2 text-[11px] focus:outline-none focus:border-emerald-500" />
+            <button class="px-3 py-2 rounded-full bg-emerald-500 text-slate-950 text-[11px] font-medium hover:bg-emerald-400">Send</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
