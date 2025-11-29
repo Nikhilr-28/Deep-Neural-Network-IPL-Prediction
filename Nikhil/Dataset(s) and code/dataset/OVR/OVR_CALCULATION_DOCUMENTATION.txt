@@ -1,0 +1,854 @@
+================================================================================
+                    IPL 2025 PLAYER OVR CALCULATION SYSTEM
+                          COMPLETE DOCUMENTATION
+================================================================================
+
+Project: El Dorado - CSCI 566 Deep Learning Project
+Team: Nikhil, Gaurav NV, Atharva Sonawane
+Date: November 29, 2025
+Version: Final v2.0
+
+================================================================================
+                            TABLE OF CONTENTS
+================================================================================
+
+1. OVERVIEW AND DESIGN PHILOSOPHY
+2. BATTING OVR SYSTEM
+   2.1 Base Batting OVR
+   2.2 Top Order OVR
+   2.3 Middle Order OVR
+   2.4 Finisher OVR
+   2.5 Batting Bonuses and Adjustments
+3. BOWLING OVR SYSTEM
+   3.1 Base Bowling OVR
+   3.2 Powerplay Bowling OVR
+   3.3 Middle Overs Bowling OVR
+   3.4 Death Overs Bowling OVR
+   3.5 Bowling Bonuses and Adjustments
+4. NORMALIZATION FUNCTIONS
+5. SPECIAL CASES AND EDGE HANDLING
+6. COMPLETE FORMULA REFERENCE
+
+================================================================================
+                     1. OVERVIEW AND DESIGN PHILOSOPHY
+================================================================================
+
+PURPOSE:
+--------
+The OVR (Overall Rating) system generates dynamic player ratings for IPL 2025
+that feed into deep learning models (TabTransformer, TFT, GAT) for match
+outcome prediction and playoff scenario analysis.
+
+CORE PRINCIPLES:
+----------------
+1. IPL T20 Reality: Thresholds tuned for the world's most batting-friendly
+   league. Bowling is harder, so bowlers receive generous scaling.
+
+2. Multi-Dimensional Assessment: Players rated across multiple positions
+   (Top/Middle/Finisher for batters, PP/Middle/Death for bowlers) to capture
+   versatility and specialization.
+
+3. Smart Data Handling: Automatic weight redistribution when data is missing
+   or sample size is insufficient. Prevents penalization for incomplete records.
+
+4. Bonus System: Rewards for experience, explosiveness, consistency, versatility,
+   and role-specific excellence (WK flexibility, captaincy).
+
+5. Debut Adjustment: Debut batters receive bonuses for potential but also a
+   7% nerf to account for unproven status. Bowlers receive full bonuses.
+
+6. OVR Range: All scores range from 55 (floor) to 97 (ceiling).
+
+KEY CONSTRAINTS:
+----------------
+- No single SR-based metric exceeds 35% weight in batting formulas
+- Aggregate SR metrics capped at 35% per formula
+- Economy rate capped at 35% for bowling formulas
+- All calculations use linear interpolation between benchmarks
+- Debut players handled with smart redistribution + bonus/penalty system
+
+================================================================================
+                        2. BATTING OVR SYSTEM
+================================================================================
+
+OVERVIEW:
+---------
+Batters receive 4 OVR scores:
+- BASE_OVR: Universal batting ability
+- TOP_ORDER_OVR: Opener/early order capability (positions 1-3)
+- MIDDLE_ORDER_OVR: Middle order capability (positions 4-5)
+- FINISHER_OVR: Death overs finishing capability (positions 6-8)
+
+All formulas use percentage-based weighting with bonuses applied additively.
+
+--------------------------------------------------------------------------------
+2.1 BASE BATTING OVR
+--------------------------------------------------------------------------------
+
+FORMULA (Normal - ≥15 innings):
+--------------------------------
+BASE_OVR = (Strike_Rate_Score × 0.30) +
+           (Batting_Average_Score × 0.20) +
+           (Boundary_Percentage_Score × 0.15) +
+           (Conversion_Score × 0.15) +
+           (Rotation_SR_Score × 0.10) +
+           (Volume_Consistency_Score × 0.10) +
+           Experience_Bonus (0-5) +
+           Match_Winner_Bonus (0-5) +
+           Debut_Bonus (0-3) +
+           Explosive_Bonus (0-5) +
+           Low_Sample_Bonus (0-4)
+
+FORMULA (Low Sample - <15 innings):
+------------------------------------
+BASE_OVR = (Strike_Rate_Score × 0.40) +        [+10% redistribution]
+           (Batting_Average_Score × 0.25) +    [+5% redistribution]
+           (Boundary_Percentage_Score × 0.25) + [+10% redistribution]
+           (Rotation_SR_Score × 0.10) +
+           [Conversion and Volume/Consistency SKIPPED - insufficient data]
+           Experience_Bonus (0-5) +
+           Debut_Bonus (0-3) +
+           Explosive_Bonus (0-5) +
+           Low_Sample_Bonus (0-4) +
+           [Match Winner SKIPPED - insufficient data]
+
+COMPONENT DETAILS:
+------------------
+
+Strike Rate Score:
+  - Normalized via normalize_strike_rate() function
+  - Benchmarks (linear interpolation):
+    ≤114 → 55 | 115 → 59 | 130 → 66 | 145 → 75 | 160 → 85 | 180 → 95 | 200+ → 97
+
+Batting Average Score:
+  - Debut players: threshold = 35 (gentler)
+  - Regular players: threshold = 50 (normal)
+  - Formula: (value / threshold) × 100, capped at 100
+
+Boundary Percentage Score:
+  - Threshold: 67%
+  - Formula: (value / 67) × 100, capped at 100
+
+Conversion Score:
+  - Average of Conversion_30→50 and Conversion_50→70 percentages
+  - Capped at 100
+
+Rotation Strike Rate Score:
+  - Threshold: 100
+  - Formula: (value / 100) × 100, capped at 100
+
+Volume & Consistency Score:
+  - Volume Component (40%): (Total_Runs / 2000) × 100
+  - Consistency Component (30%): CV-based (0.7 CV = 100, 1.0 CV = 70, 1.3 CV = 40)
+  - Quality Component (30%): (Batting_Average / 40) × 100
+  - Combined and capped at 100
+
+--------------------------------------------------------------------------------
+2.2 TOP ORDER OVR
+--------------------------------------------------------------------------------
+
+FORMULA (Normal - ≥15 innings):
+--------------------------------
+TOP_OVR = (Powerplay_SR_Score × 0.25) +
+          (Overall_SR_Score × 0.10) +
+          [SR AGGREGATE: 35%]
+          (Boundary_Percentage_Score × 0.25) +
+          (Conversion_50→70_Score × 0.20) +
+          (Volume_Consistency_Score × 0.10) +
+          (Batting_Average_Score × 0.10) +
+          Experience_Bonus (0-5) +
+          Debut_Bonus (0-3) +
+          Explosive_Bonus (0-5) +
+          Low_Sample_Bonus (0-4) +
+          Opener_Bonus (0 or 3)
+
+FORMULA (Low Sample - <15 innings):
+------------------------------------
+TOP_OVR = (Powerplay_SR_Score × 0.35) +        [+10% redistribution]
+          (Overall_SR_Score × 0.15) +          [+5% redistribution]
+          (Boundary_Percentage_Score × 0.35) + [+10% redistribution]
+          (Batting_Average_Score × 0.15) +     [+5% redistribution]
+          [Conversion and Volume/Consistency SKIPPED]
+          Experience_Bonus (0-5) +
+          Debut_Bonus (0-3) +
+          Explosive_Bonus (0-5) +
+          Low_Sample_Bonus (0-4)
+
+SPECIAL FEATURES:
+-----------------
+
+Smart SR Blending:
+  - If Powerplay_Balls < 60: Blends Powerplay SR with Overall SR
+  - Weight = Powerplay_Balls / 60
+  - Effective_PP_SR = (PP_SR × weight) + (Overall_SR × (1 - weight))
+
+Opener Bonus (+3 OVR):
+  - Requires: Powerplay_Balls ≥60 AND Death_Balls ≥60 (real data, not blended)
+  - Requires: |Powerplay_SR - Death_SR| ≤ 15
+  - Indicates: Full-innings capability with consistent aggression
+
+--------------------------------------------------------------------------------
+2.3 MIDDLE ORDER OVR
+--------------------------------------------------------------------------------
+
+FORMULA (Normal - ≥15 innings):
+--------------------------------
+MIDDLE_OVR = (Overall_SR_Score × 0.30) +
+             [SR AGGREGATE: 30%]
+             (Rotation_SR_Score × 0.25) +
+             (Conversion_30→50_Score × 0.20) +
+             (Batting_Average_Score × 0.15) +
+             (Volume_Consistency_Score × 0.10) +
+             Experience_Bonus (0-5) +
+             Debut_Bonus (0-3) +
+             Explosive_Bonus (0-5) +
+             Low_Sample_Bonus (0-4) +
+             Versatility_Bonus (0 or 4)
+
+VERSATILITY BONUS (+4 OVR):
+---------------------------
+- Applied if ALL position OVRs (Top, Middle, Finisher) are within ±5 of each other
+- Checks every pairwise comparison: |OVR_i - OVR_j| ≤ 5 for all i,j
+- Indicates true all-position capability
+- ONLY added to Middle Order OVR
+
+--------------------------------------------------------------------------------
+2.4 FINISHER OVR
+--------------------------------------------------------------------------------
+
+FORMULA (Normal - ≥15 innings):
+--------------------------------
+FINISHER_OVR = (Death_Overs_SR_Score × 0.25) +
+               (Overall_SR_Score × 0.10) +
+               [SR AGGREGATE: 35%]
+               (Boundary_Percentage_Score × 0.25) +
+               (Not_Out_Ratio_Score × 0.10) +
+               (Sixes_Per_Innings_Score × 0.15) +
+               (Volume_Consistency_Score × 0.10) +
+               (Batting_Average_Score × 0.05) +
+               Experience_Bonus (0-5) +
+               Debut_Bonus (0-3) +
+               Explosive_Bonus (0-5) +
+               Low_Sample_Bonus (0-4) +
+               Rotation_Penalty (0 or -3)
+
+SPECIAL FEATURES:
+-----------------
+
+Smart Death SR Blending:
+  - If Death_Balls < 60: Blends Death SR with Overall SR
+  - Weight = Death_Balls / 60
+  - Effective_Death_SR = (Death_SR × weight) + (Overall_SR × (1 - weight))
+
+Not Out Ratio Score:
+  - Formula: (Not_Outs / Total_Innings) × 100
+  - Rewards finishers who stay till the end
+
+Sixes Per Innings Score:
+  - Threshold: 3.0 sixes/innings = 100
+  - Formula: (value / 3.0) × 100, capped at 100
+
+Rotation Penalty (-3 OVR):
+  - Applied if Rotation_SR > 100
+  - High rotation SR indicates middle order trait, not finisher
+  - Prevents misclassification
+
+--------------------------------------------------------------------------------
+2.5 BATTING BONUSES AND ADJUSTMENTS
+--------------------------------------------------------------------------------
+
+EXPERIENCE BONUS (0-5 OVR):
+---------------------------
+Innings ≥50 → +5
+Innings ≥30 → +4
+Innings ≥20 → +3
+Innings ≥15 → +2
+Innings <15 → +0
+
+MATCH WINNER BONUS (0-5 OVR):
+------------------------------
+Only applied if innings ≥15 (sufficient data)
+
+Components (capped at +5 total):
+  - High Conversion 30→50 (>60%) AND Conversion 50→70 (>40%) → +3
+  - Not Out % >40% → +2
+  - Low Coefficient of Variation <0.7 → +2
+  - Count of 50+ scores ≥10 → +2
+
+DEBUT POTENTIAL BONUS (0-3 OVR):
+---------------------------------
+Only for DEBUT = 'YES' players with ≥100 balls faced
+
+SR ≥170 → +3
+SR ≥150 → +2
+SR ≥140 → +1
+
+EXPLOSIVE BATSMAN BONUS (0-5 OVR):
+-----------------------------------
+SR ≥160 AND Boundary% ≥65 → +5
+SR ≥155 AND Boundary% ≥62 → +4
+SR ≥150 AND Boundary% ≥60 → +3
+SR ≥145 AND Boundary% ≥58 → +2
+
+Additional: +1 if Sixes_Per_Innings ≥2.5 (capped at total +5)
+
+LOW SAMPLE BONUS (0-4 OVR):
+----------------------------
+Only for innings <15 AND balls ≥100
+
+SR ≥140 AND Boundary% ≥70 → +4.0
+SR ≥135 AND Boundary% ≥65 → +3.5
+SR ≥130 AND Boundary% ≥60 → +3.0
+SR ≥120 AND Boundary% ≥55 → +2.0
+
+WK-BATTER BONUS (+3.5 OVR):
+---------------------------
+Only for Player_Type = 'WK-Batter'
+Added to the HIGHEST position OVR (Top, Middle, or Finisher)
+Rewards wicketkeeping flexibility (no WK-specific stats available)
+
+CAPTAIN BONUS (+2 OVR):
+------------------------
+Only if 'captain' field = True (from Kaggle data)
+Added to:
+  1. BASE_OVR (+2)
+  2. HIGHEST position OVR (+2)
+
+DEBUT NERF (-7%):
+-----------------
+Applied AFTER all calculations but BEFORE versatility/WK/captain bonuses
+Only for DEBUT = 'YES' batters (NOT bowlers)
+
+All 4 OVRs multiplied by 0.93:
+  - BASE_OVR × 0.93
+  - TOP_OVR × 0.93
+  - MIDDLE_OVR × 0.93
+  - FINISHER_OVR × 0.93
+
+Rationale: Accounts for unproven status and uncertainty
+
+================================================================================
+                        3. BOWLING OVR SYSTEM
+================================================================================
+
+OVERVIEW:
+---------
+Bowlers receive 4 OVR scores + correction:
+- BASE_OVR: Universal bowling ability (CORRECTED post-calculation)
+- POWERPLAY_OVR: Powerplay effectiveness (overs 1-6)
+- MIDDLE_OVERS_OVR: Middle overs effectiveness (overs 7-15)
+- DEATH_OVERS_OVR: Death overs effectiveness (overs 16-20)
+
+All bowling OVRs receive +7 IPL buff to account for batting-friendly conditions.
+
+BASE_OVR CORRECTION:
+--------------------
+After calculating all 4 OVRs, BASE is recalculated as:
+  BASE_OVR = Average of TOP 2 phase OVRs (PP, Middle, Death)
+
+This prevents over-inflation and ensures BASE reflects actual specialist strength.
+
+Example:
+  PP: 88, Middle: 92, Death: 85
+  TOP 2: [92, 88]
+  Corrected BASE: (92 + 88) / 2 = 90
+
+--------------------------------------------------------------------------------
+3.1 BASE BOWLING OVR
+--------------------------------------------------------------------------------
+
+FORMULA (Normal - ≥10 innings):
+--------------------------------
+BASE_OVR = (Economy_Rate_Score × 0.25) +
+           (Bowling_Average_Score × 0.20) +
+           (Bowling_Strike_Rate_Score × 0.15) +
+           (Dot_Ball_Percentage_Score × 0.18) +
+           (Wicket_Taking_Ability_Score × 0.10) +
+           (Consistency_Score × 0.10) +
+           (Multi_Wicket_Score × 0.02) +
+           Experience_Bonus (0-5) +
+           Debut_Bonus (0-3) +
+           IPL_Buff (+7)
+
+Then CORRECTED to: Average of top 2 phase OVRs
+
+FORMULA (Low Sample - <10 innings):
+------------------------------------
+BASE_OVR = (Economy_Rate_Score × 0.30) +       [+5% redistribution]
+           (Bowling_Average_Score × 0.25) +    [+5% redistribution]
+           (Bowling_Strike_Rate_Score × 0.20) + [+5% redistribution]
+           (Dot_Ball_Percentage_Score × 0.18) +
+           (Wicket_Taking_Ability_Score × 0.05) + [-5% redistribution]
+           (Multi_Wicket_Score × 0.02) +
+           [Consistency SKIPPED - insufficient data]
+           Experience_Bonus (0-5) +
+           Debut_Bonus (0-3) +
+           IPL_Buff (+7)
+
+Then CORRECTED to: Average of top 2 phase OVRs
+
+COMPONENT DETAILS:
+------------------
+
+Economy Rate Score (IPL-Tuned):
+  - Normalized via normalize_economy_rate() function
+  - Benchmarks (linear interpolation, inverted scale):
+    ≤7.0 → 97 | 7.5 → 93 | 8.0 → 89 | 8.5 → 85 | 9.0 → 81
+    9.3 → 77 (penalty threshold) | 10.0 → 70 | 11.0 → 62 | ≥12.0 → 55
+  - <7.0: Bonus up to 97 (phase OVRs can exceed with elite economy)
+
+Bowling Average Score (IPL-Tuned):
+  - Benchmarks (linear interpolation):
+    ≤20 → 97 | 24 → 91 | 28 → 86 | 32 → 77 | 36 → 68 | 40 → 60 | ≥44 → 55
+  - Gentler scaling acknowledges T20 batting dominance
+
+Bowling Strike Rate Score (IPL-Tuned):
+  - Benchmarks (linear interpolation):
+    ≤15 → 97 | 18 → 91 | 21 → 86 | 24 → 77 | 27 → 68 | 30 → 60 | ≥33 → 55
+  - Wicket every 2-3 overs = elite in T20
+
+Dot Ball Percentage Score (IPL-Tuned):
+  - Threshold: 40% (reduced from 50% - more realistic for IPL)
+  - Formula: (value / 40) × 100, capped at 100
+
+Wicket Taking Ability Score:
+  - Threshold: 100
+  - Formula: (value / 100) × 100, capped at 100
+
+Consistency Score:
+  - Only calculated if innings ≥10
+  - Components:
+    * Wicketless % (inverted, 50%): (100 - Wicketless%)
+    * Economy CV (inverted, 30%): (100 - Economy_CV)
+    * Wickets StdDev (inverted, 20%): (100 - Wickets_SD × 20)
+  - Weighted: 50% + 30% + 20%
+
+Multi-Wicket Score:
+  - Based on Percentage_3_Plus_Wickets
+  - Threshold: 10% = 100 (1 in 10 innings = excellent)
+  - Formula: min(100, Percentage × 10)
+
+--------------------------------------------------------------------------------
+3.2 POWERPLAY BOWLING OVR
+--------------------------------------------------------------------------------
+
+FORMULA (Normal - Has PP data):
+--------------------------------
+PP_OVR = (Powerplay_Economy_Score × 0.35) +
+         (Powerplay_Wickets_Score × 0.30) +
+         (Dot_Ball_Percentage_Score × 0.20) +
+         (Control_Index_Score × 0.15) +
+         Experience_Bonus (0-5) +
+         Debut_Bonus (0-3) +
+         IPL_Buff (+7)
+
+FORMULA (Missing PP data):
+---------------------------
+PP_OVR = (Overall_Economy_Score × 0.50) +      [Redistributed]
+         (Dot_Ball_Percentage_Score × 0.30) +  [Increased]
+         (Control_Index_Score × 0.20) +        [Increased]
+         Experience_Bonus (0-5) +
+         Debut_Bonus (0-3) +
+         IPL_Buff (+7)
+
+COMPONENT DETAILS:
+------------------
+
+Powerplay Economy Score:
+  - Same normalization as overall economy (normalize_economy_rate)
+
+Powerplay Wickets Score:
+  - Threshold: 15 wickets = 100
+  - Formula: (value / 15) × 100, capped at 100
+
+Control Index Score:
+  - Threshold: 100
+  - Formula: (value / 100) × 100, capped at 100
+
+--------------------------------------------------------------------------------
+3.3 MIDDLE OVERS BOWLING OVR
+--------------------------------------------------------------------------------
+
+FORMULA:
+--------
+MIDDLE_OVR = (Economy_Rate_Score × 0.35) +
+             (Dot_Ball_Percentage_Score × 0.25) +
+             (Bowling_Strike_Rate_Score × 0.25) +
+             (Control_Index_Score × 0.15) +
+             Experience_Bonus (0-5) +
+             Debut_Bonus (0-3) +
+             IPL_Buff (+7)
+
+No redistribution (uses overall stats, always available)
+
+--------------------------------------------------------------------------------
+3.4 DEATH OVERS BOWLING OVR
+--------------------------------------------------------------------------------
+
+FORMULA (Normal - Has Death data):
+-----------------------------------
+DEATH_OVR = (Death_Overs_Economy_Score × 0.30) +
+            (Death_Wickets_Score × 0.25) +
+            (Boundary_Control_Score × 0.22) +
+            (Discipline_Score × 0.13) +
+            (Pressure_Index_Score × 0.10) +
+            Experience_Bonus (0-5) +
+            Debut_Bonus (0-3) +
+            IPL_Buff (+7)
+
+FORMULA (Missing Death data):
+------------------------------
+DEATH_OVR = (Overall_Economy_Score × 0.40) +         [Redistributed]
+            (Boundary_Control_Score × 0.30) +        [Increased]
+            (Discipline_Score × 0.20) +              [Increased]
+            (Pressure_Index_Score × 0.10) +
+            Experience_Bonus (0-5) +
+            Debut_Bonus (0-3) +
+            IPL_Buff (+7)
+
+COMPONENT DETAILS:
+------------------
+
+Death Overs Economy Score:
+  - Same normalization as overall economy
+
+Death Wickets Score:
+  - Threshold: 12 wickets = 100
+  - Formula: (value / 12) × 100, capped at 100
+
+Boundary Control Score:
+  - Boundary Concession Rate component (60%):
+    Formula: max(0, 100 - (Boundary_Rate × 4))
+    10% = 100, 25% = 0
+  - Non-Boundary Economy component (40%):
+    Threshold: 3.0 = 100
+    Inverted: 100 - normalize(value, 3.0)
+  - Weighted: 60% + 40%
+
+Discipline Score:
+  - Threshold: 100
+  - Formula: (value / 100) × 100, capped at 100
+  - Based on extras conceded (wides, no-balls)
+
+Pressure Index Score:
+  - Threshold: 100
+  - Formula: (value / 100) × 100, capped at 100
+
+--------------------------------------------------------------------------------
+3.5 BOWLING BONUSES AND ADJUSTMENTS
+--------------------------------------------------------------------------------
+
+EXPERIENCE BONUS (0-5 OVR):
+---------------------------
+Same as batting:
+Innings ≥50 → +5
+Innings ≥30 → +4
+Innings ≥20 → +3
+Innings ≥15 → +2
+Innings <15 → +0
+
+DEBUT BOWLING BONUS (0-3 OVR):
+-------------------------------
+Only for DEBUT = 'YES' bowlers with ≥100 balls bowled
+
+Economy ≤7.5 → +3
+Economy ≤8.5 → +2
+Economy ≤9.0 → +1
+
+IPL T20 BUFF (+7 OVR):
+-----------------------
+Applied to ALL 4 bowling OVRs (before BASE correction)
+Rationale: Bowling in IPL is significantly harder than other T20 leagues
+Ensures elite bowlers (8-9 RPO economy) reach appropriate OVR (85-92 range)
+
+NO DEBUT NERF FOR BOWLERS:
+---------------------------
+Unlike batters, debut bowlers do NOT receive -7% nerf
+Rationale: Bowling performance less dependent on experience/familiarity
+
+================================================================================
+                      4. NORMALIZATION FUNCTIONS
+================================================================================
+
+STRIKE RATE NORMALIZATION (Batting):
+-------------------------------------
+Function: normalize_strike_rate(sr)
+Returns: 55-97 OVR score
+
+Benchmarks (linear interpolation between all points):
+  ≤114 or 0 → 55 (floor)
+  115 → 59
+  130 → 66
+  145 → 75
+  160 → 85
+  180 → 95
+  ≥200 → 97 (ceiling)
+
+Example:
+  SR = 154
+  Between 145-160: ratio = (154-145)/(160-145) = 0.6
+  Score = 75 + (0.6 × (85-75)) = 75 + 6 = 81
+
+ECONOMY RATE NORMALIZATION (Bowling):
+--------------------------------------
+Function: normalize_economy_rate(econ)
+Returns: 55-97 OVR score (inverted - lower economy = higher score)
+
+Benchmarks (linear interpolation, inverted scale):
+  ≤7.0 → 97
+  7.5 → 93
+  8.0 → 89
+  8.5 → 85
+  9.0 → 81
+  9.3 → 77 (penalty threshold)
+  10.0 → 70
+  11.0 → 62
+  ≥12.0 → 55 (floor)
+
+Special: <7.0 can give bonus up to 97 for phase-specific OVRs
+
+Example:
+  Economy = 8.12
+  Between 8.0-8.5: ratio = (8.12-8.0)/(8.5-8.0) = 0.24
+  Score = 89 - (0.24 × (89-85)) = 89 - 0.96 = 88.04
+
+BOWLING AVERAGE NORMALIZATION (IPL-Tuned):
+-------------------------------------------
+Function: normalize_bowling_average(avg)
+Returns: 55-97 OVR score
+
+Benchmarks (linear interpolation):
+  ≤20 → 97
+  24 → 91
+  28 → 86
+  32 → 77
+  36 → 68
+  40 → 60
+  ≥44 → 55 (floor)
+
+Example:
+  Average = 27.46
+  Between 24-28: ratio = (27.46-24)/(28-24) = 0.865
+  Score = 91 - (0.865 × (91-86)) = 91 - 4.325 = 86.675
+
+BOWLING STRIKE RATE NORMALIZATION (IPL-Tuned):
+-----------------------------------------------
+Function: normalize_bowling_strike_rate(sr)
+Returns: 55-97 OVR score
+
+Benchmarks (linear interpolation):
+  ≤15 → 97
+  18 → 91
+  21 → 86
+  24 → 77
+  27 → 68
+  30 → 60
+  ≥33 → 55 (floor)
+
+GENERIC METRIC NORMALIZATION:
+------------------------------
+Function: normalize_metric_to_100(value, threshold)
+Returns: 0-100 score
+
+Formula: (value / threshold) × 100
+Capped at 100
+
+Used for: Dots %, Boundary %, Rotation SR, Control Index, etc.
+
+SMART SR BLENDING:
+------------------
+Function: get_effective_sr(phase_sr, phase_balls, overall_sr, min_sample=60)
+Returns: Effective SR to use
+
+If phase_balls ≥ min_sample:
+  Return phase_sr (sufficient data)
+Else:
+  weight = phase_balls / min_sample
+  Return (phase_sr × weight) + (overall_sr × (1 - weight))
+
+Example:
+  Death SR = 83.33, Death Balls = 12, Overall SR = 183.87
+  Weight = 12/60 = 0.2
+  Effective = (83.33 × 0.2) + (183.87 × 0.8) = 16.67 + 147.10 = 163.77
+
+================================================================================
+                   5. SPECIAL CASES AND EDGE HANDLING
+================================================================================
+
+DEBUT PLAYERS (DEBUT = 'YES'):
+-------------------------------
+
+Batters:
+  - Lower average threshold (35 vs 50) for less penalty
+  - Eligible for Debut Potential Bonus (up to +3)
+  - Eligible for Low Sample Bonus if <15 innings (up to +4)
+  - Subject to -7% nerf on all 4 OVRs AFTER calculation
+  - Net effect: Small boost for impressive debuts, but conservative overall
+
+Bowlers:
+  - Eligible for Debut Bowling Bonus (up to +3)
+  - NO nerf applied (unlike batters)
+  - Full IPL buff (+7) applies
+
+LOW SAMPLE SIZE (<15 innings for batters, <10 innings for bowlers):
+--------------------------------------------------------------------
+
+Batters:
+  - Weights redistributed: SR/Avg/Boundary boosted, Conversion/Volume skipped
+  - Eligible for Low Sample Bonus (up to +4)
+  - Match Winner Bonus skipped (insufficient data)
+
+Bowlers:
+  - Weights redistributed: Econ/Avg/SR boosted, Wicket Ability reduced
+  - Consistency Score skipped
+  - Otherwise normal calculation
+
+MISSING PHASE DATA:
+-------------------
+
+Batters:
+  - Powerplay SR: Blends with Overall SR if <60 balls
+  - Death SR: Blends with Overall SR if <60 balls
+  - Automatic, seamless handling
+
+Bowlers:
+  - Powerplay OVR: Uses overall economy if no PP data
+  - Death OVR: Uses overall economy if no death data
+  - Weights automatically redistributed
+
+ALL-ROUNDERS:
+-------------
+  - Receive BOTH batting and bowling OVRs
+  - Treated as batters for batting calculations
+  - Treated as bowlers for bowling calculations
+  - No special all-rounder multiplier (handled by model later)
+
+WICKET-KEEPERS (WK-Batter):
+---------------------------
+  - Receive +3.5 to their HIGHEST position OVR
+  - Rationale: No WK-specific stats available, bonus for flexibility
+  - Applied AFTER debut nerf, BEFORE versatility/captain bonuses
+
+CAPTAINS:
+---------
+  - Receive +2 to BASE_OVR
+  - Receive +2 to HIGHEST position OVR
+  - Applied AFTER debut nerf and WK bonus
+  - Based on 'captain' field from Kaggle match data
+
+ZERO/MISSING VALUES:
+--------------------
+  - All normalization functions handle 0 and NaN gracefully
+  - 0 or NaN → returns 0 score (not floor of 55)
+  - Floor of 55 only applied to final OVR after all components summed
+  - Prevents artificial inflation from missing data
+
+EXTREME VALUES:
+---------------
+  - All scores capped at 97 ceiling before rounding
+  - All scores floored at 55 before rounding
+  - Final rounding to 1 decimal place
+  - Example: 97.8 → 97.0 (ceiling), 54.2 → 55.0 (floor)
+
+================================================================================
+                    6. COMPLETE FORMULA REFERENCE
+================================================================================
+
+BATTING FORMULAS (Quick Reference):
+------------------------------------
+
+BASE (≥15 innings):
+  SR(30%) + Avg(20%) + Bound(15%) + Conv(15%) + Rot(10%) + VC(10%)
+  + Exp(0-5) + MW(0-5) + Debut(0-3) + Explo(0-5) + LowSamp(0-4)
+
+BASE (<15 innings):
+  SR(40%) + Avg(25%) + Bound(25%) + Rot(10%)
+  + Exp(0-5) + Debut(0-3) + Explo(0-5) + LowSamp(0-4)
+
+TOP (≥15 innings):
+  PP_SR(25%) + SR(10%) + Bound(25%) + Conv50-70(20%) + VC(10%) + Avg(10%)
+  + Exp(0-5) + Debut(0-3) + Explo(0-5) + LowSamp(0-4) + Opener(0/3)
+
+MIDDLE (≥15 innings):
+  SR(30%) + Rot(25%) + Conv30-50(20%) + Avg(15%) + VC(10%)
+  + Exp(0-5) + Debut(0-3) + Explo(0-5) + LowSamp(0-4) + Versatile(0/4)
+
+FINISHER (≥15 innings):
+  Death_SR(25%) + SR(10%) + Bound(25%) + NotOut(10%) + Sixes(15%) + VC(10%) + Avg(5%)
+  + Exp(0-5) + Debut(0-3) + Explo(0-5) + LowSamp(0-4) - RotPenalty(0/3)
+
+ALL batting OVRs then:
+  If DEBUT='YES': Multiply by 0.93 (-7% nerf)
+  Apply WK bonus if applicable (+3.5 to highest)
+  Apply Captain bonus if applicable (+2 to base and highest)
+  Apply Versatility bonus if applicable (+4 to middle)
+
+BOWLING FORMULAS (Quick Reference):
+------------------------------------
+
+BASE (≥10 innings):
+  Econ(25%) + Avg(20%) + SR(15%) + Dots(18%) + Wicket(10%) + Consist(10%) + Multi(2%)
+  + Exp(0-5) + Debut(0-3) + IPL(+7)
+  THEN CORRECTED: (Top2_Phase_OVRs) / 2
+
+BASE (<10 innings):
+  Econ(30%) + Avg(25%) + SR(20%) + Dots(18%) + Wicket(5%) + Multi(2%)
+  + Exp(0-5) + Debut(0-3) + IPL(+7)
+  THEN CORRECTED: (Top2_Phase_OVRs) / 2
+
+POWERPLAY (has PP data):
+  PP_Econ(35%) + PP_Wickets(30%) + Dots(20%) + Control(15%)
+  + Exp(0-5) + Debut(0-3) + IPL(+7)
+
+POWERPLAY (no PP data):
+  Econ(50%) + Dots(30%) + Control(20%)
+  + Exp(0-5) + Debut(0-3) + IPL(+7)
+
+MIDDLE:
+  Econ(35%) + Dots(25%) + SR(25%) + Control(15%)
+  + Exp(0-5) + Debut(0-3) + IPL(+7)
+
+DEATH (has death data):
+  Death_Econ(30%) + Death_Wickets(25%) + BoundControl(22%) + Discipline(13%) + Pressure(10%)
+  + Exp(0-5) + Debut(0-3) + IPL(+7)
+
+DEATH (no death data):
+  Econ(40%) + BoundControl(30%) + Discipline(20%) + Pressure(10%)
+  + Exp(0-5) + Debut(0-3) + IPL(+7)
+
+THRESHOLD REFERENCE:
+--------------------
+
+Batting Strike Rate:
+  ≤114→55 | 115→59 | 130→66 | 145→75 | 160→85 | 180→95 | ≥200→97
+
+Economy Rate (Bowling):
+  ≤7.0→97 | 7.5→93 | 8.0→89 | 8.5→85 | 9.0→81 | 9.3→77 | 10.0→70 | 11.0→62 | ≥12.0→55
+
+Bowling Average:
+  ≤20→97 | 24→91 | 28→86 | 32→77 | 36→68 | 40→60 | ≥44→55
+
+Bowling Strike Rate:
+  ≤15→97 | 18→91 | 21→86 | 24→77 | 27→68 | 30→60 | ≥33→55
+
+Generic Thresholds:
+  Batting Average (regular): 50
+  Batting Average (debut): 35
+  Boundary %: 67
+  Rotation SR: 100
+  Dot % (bowling): 40
+  Powerplay Wickets: 15
+  Death Wickets: 12
+
+================================================================================
+                              END OF DOCUMENT
+================================================================================
+
+For questions or clarifications, contact:
+Team: Nikhil, Gaurav NV, Atharva Sonawane
+Project: El Dorado - CSCI 566
+Date: November 29, 2025
+
+This document is comprehensive and covers all aspects of the OVR calculation
+system. All formulas, thresholds, bonuses, and special cases are documented
+in detail.
