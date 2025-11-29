@@ -1,6 +1,6 @@
 # IPL 2025 Master Dataset Report
 
-**Generated:** 2025-11-29 04:04:47
+**Generated:** 2025-11-29 05:29:02
 **Data Range:** 2021-2024 (4 seasons)
 **Version:** 2.0 - Comprehensive Edition
 
@@ -9,8 +9,8 @@
 ## 📊 Dataset Summary
 
 ### BATTING_MASTER_2025.csv
-- **Total Players:** 156
-- **Current Players:** 109
+- **Total Players:** 157
+- **Current Players:** 110
 - **Debut Players:** 47
 - **Total Attributes:** 57
 

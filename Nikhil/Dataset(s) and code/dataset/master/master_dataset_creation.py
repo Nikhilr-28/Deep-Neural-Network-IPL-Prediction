@@ -113,6 +113,10 @@ def print_warning(message):
     """Print warning message"""
     print(f"  ⚠️  {message}")
 
+def print_error(message):
+    """Print error message"""
+    print(f"  ❌ {message}")
+
 def safe_divide(numerator, denominator, default=0.0):
     """Safely divide two numbers"""
     try:
@@ -782,7 +786,7 @@ def process_debut_players_with_data(debut_players, debut_batting_df, debut_bowli
         if player_type in ['Batter', 'WK-Batter', 'All-Rounder']:
             if len(debut_batting_df) > 0:
                 # Try to find player in debut_batting.csv
-                debut_data = debut_batting_df[debut_batting_df['Player_Name'] == player_name]
+                debut_data = debut_batting_df[debut_batting_df['Player_Name'].str.strip() == player_name.strip()]
                 
                 if len(debut_data) > 0:
                     # Found data - calculate derived metrics
@@ -804,7 +808,7 @@ def process_debut_players_with_data(debut_players, debut_batting_df, debut_bowli
         if player_type in ['Bowler', 'All-Rounder']:
             if len(debut_bowling_df) > 0:
                 # Try to find player in debut_bowling.csv
-                debut_data = debut_bowling_df[debut_bowling_df['Player_Name'] == player_name]
+                debut_data = debut_bowling_df[debut_bowling_df['Player_Name'].str.strip() == player_name.strip()]
                 
                 if len(debut_data) > 0:
                     # Found data - calculate derived metrics
@@ -1051,6 +1055,39 @@ def process_all_players(data):
     bowling_df = data['bowling']
     match_outcomes = data['match_outcomes']
     
+    # ═══════════════════════════════════════════════════════════════════════════
+    # FAILSAFE: VALIDATE NO OVERLAP BETWEEN CURRENT AND DEBUT PLAYERS
+    # ═══════════════════════════════════════════════════════════════════════════
+    print_progress("Running failsafe validation...")
+    
+    current_names = set(current_players['2025_FullName'].str.strip())
+    debut_names = set(debut_players['2025_FullName'].str.strip())
+    
+    overlap = current_names.intersection(debut_names)
+    
+    if len(overlap) > 0:
+        print_error("═" * 80)
+        print_error("🚨 CRITICAL ERROR: PLAYER OVERLAP DETECTED!")
+        print_error("═" * 80)
+        print_error(f"\n{len(overlap)} player(s) appear in BOTH current_players AND debut_players lists:\n")
+        
+        for name in sorted(overlap):
+            print_warning(f"  ❌ {name}")
+        
+        print_error("\n" + "═" * 80)
+        print_error("REQUIRED ACTION:")
+        print_error("  1. Check nomenclature files:")
+        print_error(f"     - current_players_2025_*.csv")
+        print_error(f"     - debut_players_2025_*.csv")
+        print_error("  2. Remove duplicates (players should be in ONE list only)")
+        print_error("  3. Re-run this script")
+        print_error("═" * 80)
+        print_error("\nSCRIPT STOPPED TO PREVENT DATA CORRUPTION\n")
+        
+        return None, None
+    
+    print_success(f"✅ Validation passed: {len(current_names)} current, {len(debut_names)} debuts (no overlap)")
+    
     batting_stats_list = []
     bowling_stats_list = []
     
@@ -1223,6 +1260,13 @@ def main():
     try:
         data = load_all_data()
         batting_df, bowling_df = process_all_players(data)
+        
+        # Check if failsafe validation stopped execution
+        if batting_df is None or bowling_df is None:
+            print_error("\n⚠️  Script execution halted due to validation errors.")
+            print_error("Please fix the issues above and re-run.\n")
+            return
+        
         batting_file, bowling_file, report_file = save_datasets(batting_df, bowling_df)
         
         end_time = datetime.now()
