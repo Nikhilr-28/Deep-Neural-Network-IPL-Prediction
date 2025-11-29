@@ -1,6 +1,6 @@
 # IPL 2025 Master Dataset Report
 
-**Generated:** 2025-11-25 02:29:57
+**Generated:** 2025-11-29 04:04:47
 **Data Range:** 2021-2024 (4 seasons)
 **Version:** 2.0 - Comprehensive Edition
 

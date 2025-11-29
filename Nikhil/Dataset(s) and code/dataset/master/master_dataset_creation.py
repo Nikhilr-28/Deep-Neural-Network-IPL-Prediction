@@ -285,7 +285,26 @@ def load_all_data():
     print_progress("Loading milestone data (best effort)...")
     data['milestones'] = load_milestone_data()
     
-    return data
+    # Load debut player pre-calculated data
+    print_progress("Loading debut player statistics...")
+    DEBUT_BATTING_CSV = NOMENCLATURE_DIR / "debut_batting.csv"
+    DEBUT_BOWLING_CSV = NOMENCLATURE_DIR / "debut_bowling.csv"
+    
+    if DEBUT_BATTING_CSV.exists():
+        data['debut_batting_stats'] = pd.read_csv(DEBUT_BATTING_CSV)
+        print_success(f"  Loaded debut batting stats: {len(data['debut_batting_stats'])} players")
+    else:
+        print_warning("  debut_batting.csv not found - will use zeros for all debuts")
+        data['debut_batting_stats'] = pd.DataFrame()
+    
+    if DEBUT_BOWLING_CSV.exists():
+        data['debut_bowling_stats'] = pd.read_csv(DEBUT_BOWLING_CSV)
+        print_success(f"  Loaded debut bowling stats: {len(data['debut_bowling_stats'])} players")
+    else:
+        print_warning("  debut_bowling.csv not found - will use zeros for all debuts")
+        data['debut_bowling_stats'] = pd.DataFrame()
+    
+    return data    
 
 def create_match_outcome_map(summary_df):
     """Create match_id -> winner mapping"""
@@ -503,6 +522,312 @@ def create_empty_batting_stats(player_row):
         stats[field] = 0.0
     
     return stats
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION A: CALCULATION FUNCTIONS FOR DEBUT PLAYERS
+# ADD THESE TWO FUNCTIONS AFTER create_empty_batting_stats() (around line 460)
+# ═══════════════════════════════════════════════════════════════════════════
+
+def calculate_derived_batting_stats(volume_row, player_row):
+    """
+    Calculate all derived batting metrics from volume data (debut players)
+    
+    Args:
+        volume_row: Row from debut_batting.csv with volume metrics
+        player_row: Row from debut_players with identification info
+    
+    Returns:
+        Complete stats dictionary with all calculated metrics
+    """
+    stats = {}
+    
+    # === CATEGORY 1: IDENTIFICATION ===
+    stats['Player_Name'] = player_row['2025_FullName']
+    stats['Kaggle_Match_Name'] = ''
+    stats['Player_Type'] = player_row['Player_Type']
+    stats['IPL_Team_2025'] = player_row['IPL_Team_2025']
+    stats['DEBUT'] = 'YES'
+    
+    # === CATEGORY 2: VOLUME METRICS (from CSV) ===
+    stats['Total_Innings'] = int(volume_row['Total_Innings'])
+    stats['Total_Runs'] = int(volume_row['Total_Runs'])
+    stats['Total_Balls_Faced'] = int(volume_row['Total_Balls_Faced'])
+    stats['Total_Minutes'] = int(volume_row['Total_Minutes'])
+    stats['Dismissals'] = int(volume_row['Dismissals'])
+    stats['Times_Not_Out'] = int(volume_row['Times_Not_Out'])
+    
+    # === CATEGORY 3: CORE AVERAGES (CALCULATE) ===
+    stats['Batting_Average'] = safe_divide(stats['Total_Runs'], stats['Dismissals'])
+    stats['Strike_Rate'] = safe_divide(stats['Total_Runs'] * 100, stats['Total_Balls_Faced'])
+    stats['Avg_Runs_Per_Innings'] = safe_divide(stats['Total_Runs'], stats['Total_Innings'])
+    stats['Avg_Balls_Per_Innings'] = safe_divide(stats['Total_Balls_Faced'], stats['Total_Innings'])
+    stats['Avg_Minutes_Per_Innings'] = safe_divide(stats['Total_Minutes'], stats['Total_Innings'])
+    
+    # === CATEGORY 4: MILESTONES (from CSV) ===
+    stats['Count_30_Plus'] = int(volume_row['Count_30_Plus'])
+    stats['Count_50_Plus'] = int(volume_row['Count_50_Plus'])
+    stats['Count_70_Plus'] = int(volume_row['Count_70_Plus'])
+    stats['Highest_Score'] = int(volume_row['Highest_Score'])
+    stats['Most_Fours_Innings'] = int(volume_row['Most_Fours_Innings'])
+    stats['Most_Sixes_Innings'] = int(volume_row['Most_Sixes_Innings'])
+    
+    # === CATEGORY 5: BOUNDARY METRICS ===
+    stats['Total_Fours'] = int(volume_row['Total_Fours'])
+    stats['Total_Sixes'] = int(volume_row['Total_Sixes'])
+    stats['Total_Boundaries'] = stats['Total_Fours'] + stats['Total_Sixes']
+    stats['Boundary_Runs'] = (stats['Total_Fours'] * 4) + (stats['Total_Sixes'] * 6)
+    
+    # CALCULATE percentages and rates
+    stats['Boundary_Percentage'] = safe_divide(stats['Boundary_Runs'] * 100, stats['Total_Runs'])
+    stats['Boundary_Frequency'] = safe_divide(stats['Total_Boundaries'] * 100, stats['Total_Balls_Faced'])
+    stats['Fours_Per_Innings'] = safe_divide(stats['Total_Fours'], stats['Total_Innings'])
+    stats['Sixes_Per_Innings'] = safe_divide(stats['Total_Sixes'], stats['Total_Innings'])
+    stats['Four_to_Six_Ratio'] = safe_divide(stats['Total_Fours'], stats['Total_Sixes'])
+    
+    # IMPACT METRICS: Balls per boundary
+    stats['Balls_Per_Four'] = safe_divide(stats['Total_Balls_Faced'], stats['Total_Fours'])
+    stats['Balls_Per_Six'] = safe_divide(stats['Total_Balls_Faced'], stats['Total_Sixes'])
+    stats['Balls_Per_Boundary'] = safe_divide(stats['Total_Balls_Faced'], stats['Total_Boundaries'])
+    
+    # === CATEGORY 6: ROTATION & CONTROL ===
+    stats['Non_Boundary_Runs'] = stats['Total_Runs'] - stats['Boundary_Runs']
+    stats['Non_Boundary_Balls'] = stats['Total_Balls_Faced'] - stats['Total_Boundaries']
+    stats['Rotation_Strike_Rate'] = safe_divide(stats['Non_Boundary_Runs'] * 100, stats['Non_Boundary_Balls'])
+    
+    # Estimate dot balls
+    estimated_dots = stats['Total_Balls_Faced'] - stats['Total_Boundaries'] - (stats['Non_Boundary_Runs'] / 0.9)
+    estimated_dots = max(0, estimated_dots)
+    stats['Estimated_Dot_Balls'] = int(estimated_dots)
+    stats['Dot_Ball_Percentage'] = safe_divide(estimated_dots * 100, stats['Total_Balls_Faced'])
+    
+    # === CATEGORY 7: CONSISTENCY METRICS ===
+    # Note: We don't have ball-by-ball data, so CV and std dev will be 0
+    stats['Runs_Std_Deviation'] = 0.0
+    stats['Runs_CV'] = 0.0
+    
+    # Milestone percentages (CALCULATE)
+    stats['Percentage_30_Plus'] = safe_divide(stats['Count_30_Plus'] * 100, stats['Total_Innings'])
+    stats['Percentage_50_Plus'] = safe_divide(stats['Count_50_Plus'] * 100, stats['Total_Innings'])
+    stats['Percentage_70_Plus'] = safe_divide(stats['Count_70_Plus'] * 100, stats['Total_Innings'])
+    
+    # Conversion rates (CALCULATE)
+    stats['Conversion_30_to_50'] = safe_divide(stats['Count_50_Plus'] * 100, stats['Count_30_Plus'])
+    stats['Conversion_50_to_70'] = safe_divide(stats['Count_70_Plus'] * 100, stats['Count_50_Plus'])
+    
+    # Failure rates (CALCULATE - we don't have per-innings data, so estimate)
+    # For debuts without ball-by-ball, these will be rough estimates
+    stats['Percentage_Single_Digit'] = 0.0  # No data available
+    stats['Percentage_Duck'] = 0.0  # No data available
+    
+    # === CATEGORY 8: PHASE-SPECIFIC STATS ===
+    # No ball-by-ball data for debuts - set to 0
+    stats['Powerplay_Runs'] = 0
+    stats['Powerplay_Balls'] = 0
+    stats['Powerplay_SR'] = 0.0
+    stats['Powerplay_Contribution'] = 0.0
+    
+    stats['Death_Overs_Runs'] = 0
+    stats['Death_Overs_Balls'] = 0
+    stats['Death_Overs_SR'] = 0.0
+    stats['Death_Overs_Contribution'] = 0.0
+    
+    # === CATEGORY 9: IMPACT SCORE ===
+    not_out_factor = 1 + (stats['Times_Not_Out'] / max(stats['Total_Innings'], 1))
+    stats['Impact_Score'] = safe_divide(stats['Total_Runs'] * stats['Strike_Rate'] * not_out_factor, 10000)
+    
+    return stats
+
+
+def calculate_derived_bowling_stats(volume_row, player_row):
+    """
+    Calculate all derived bowling metrics from volume data (debut players)
+    
+    Args:
+        volume_row: Row from debut_bowling.csv with volume metrics
+        player_row: Row from debut_players with identification info
+    
+    Returns:
+        Complete stats dictionary with all calculated metrics
+    """
+    stats = {}
+    
+    # === CATEGORY 1: IDENTIFICATION ===
+    stats['Player_Name'] = player_row['2025_FullName']
+    stats['Kaggle_Match_Name'] = ''
+    stats['Player_Type'] = player_row['Player_Type']
+    stats['IPL_Team_2025'] = player_row['IPL_Team_2025']
+    stats['DEBUT'] = 'YES'
+    
+    # === CATEGORY 2: VOLUME METRICS (from CSV) ===
+    stats['Total_Innings_Bowled'] = int(volume_row['Total_Innings_Bowled'])
+    stats['Total_Overs_Bowled'] = float(volume_row['Total_Overs_Bowled'])
+    stats['Total_Balls_Bowled'] = int(volume_row['Total_Balls_Bowled'])
+    stats['Total_Runs_Conceded'] = int(volume_row['Total_Runs_Conceded'])
+    stats['Total_Wickets'] = int(volume_row['Total_Wickets'])
+    stats['Total_Maidens'] = int(volume_row['Total_Maidens'])
+    stats['Total_Dot_Balls'] = int(volume_row['Total_Dot_Balls'])
+    
+    # === CATEGORY 3: CORE AVERAGES (CALCULATE) ===
+    stats['Bowling_Average'] = safe_divide(stats['Total_Runs_Conceded'], stats['Total_Wickets'])
+    stats['Economy_Rate'] = safe_divide(stats['Total_Runs_Conceded'], stats['Total_Overs_Bowled'])
+    stats['Bowling_Strike_Rate'] = safe_divide(stats['Total_Balls_Bowled'], stats['Total_Wickets'])
+    stats['Avg_Wickets_Per_Innings'] = safe_divide(stats['Total_Wickets'], stats['Total_Innings_Bowled'])
+    stats['Avg_Overs_Per_Innings'] = safe_divide(stats['Total_Overs_Bowled'], stats['Total_Innings_Bowled'])
+    stats['Avg_Runs_Per_Innings'] = safe_divide(stats['Total_Runs_Conceded'], stats['Total_Innings_Bowled'])
+    stats['Wickets_Per_Over'] = safe_divide(stats['Total_Wickets'], stats['Total_Overs_Bowled'])
+    stats['Runs_Per_Ball'] = safe_divide(stats['Total_Runs_Conceded'], stats['Total_Balls_Bowled'])
+    
+    # === CATEGORY 4: WICKET MILESTONES (from CSV) ===
+    stats['Count_3_Wickets'] = int(volume_row['Count_3_Wickets'])
+    stats['Count_4_Wickets'] = int(volume_row['Count_4_Wickets'])
+    stats['Count_5_Wickets'] = int(volume_row['Count_5_Wickets'])
+    
+    # Best bowling figures
+    stats['Best_Bowling_Figures'] = str(volume_row['Best_Bowling_Figures'])
+    stats['Best_Bowling_Wickets'] = int(volume_row['Best_Bowling_Wickets'])
+    stats['Best_Bowling_Runs'] = int(volume_row['Best_Bowling_Runs'])
+    stats['Best_Economy_Innings'] = float(volume_row.get('Best_Economy_Innings', 0.0))
+    
+    stats['Most_Dots_Innings'] = int(volume_row.get('Most_Dots_Innings', 0))
+    stats['Most_Wickets_Match'] = int(volume_row['Best_Bowling_Wickets'])  # Same as best
+    
+    # === CATEGORY 5: CONTROL METRICS ===
+    stats['Dot_Ball_Percentage'] = safe_divide(stats['Total_Dot_Balls'] * 100, stats['Total_Balls_Bowled'])
+    
+    complete_overs = int(stats['Total_Overs_Bowled'])
+    stats['Maiden_Percentage'] = safe_divide(stats['Total_Maidens'] * 100, complete_overs)
+    
+    # Boundaries conceded (from CSV)
+    stats['Total_Fours_Conceded'] = int(volume_row['Total_Fours_Conceded'])
+    stats['Total_Sixes_Conceded'] = int(volume_row['Total_Sixes_Conceded'])
+    stats['Boundaries_Conceded'] = stats['Total_Fours_Conceded'] + stats['Total_Sixes_Conceded']
+    
+    # CALCULATE rates and percentages
+    stats['Boundary_Concession_Rate'] = safe_divide(stats['Boundaries_Conceded'] * 100, stats['Total_Balls_Bowled'])
+    stats['Runs_From_Boundaries'] = (stats['Total_Fours_Conceded'] * 4) + (stats['Total_Sixes_Conceded'] * 6)
+    stats['Boundary_Run_Percentage'] = safe_divide(stats['Runs_From_Boundaries'] * 100, stats['Total_Runs_Conceded'])
+    
+    # Control indices (CALCULATE)
+    stats['Control_Index'] = safe_divide((stats['Total_Dot_Balls'] - stats['Boundaries_Conceded']), stats['Total_Balls_Bowled'])
+    stats['Pressure_Index'] = safe_divide((stats['Total_Dot_Balls'] + stats['Total_Maidens'] * 6), stats['Total_Balls_Bowled'])
+    stats['Scoring_Ball_Percentage'] = safe_divide((stats['Total_Balls_Bowled'] - stats['Total_Dot_Balls']) * 100, stats['Total_Balls_Bowled'])
+    
+    non_boundary_runs = stats['Total_Runs_Conceded'] - stats['Runs_From_Boundaries']
+    stats['Non_Boundary_Economy'] = safe_divide(non_boundary_runs, stats['Total_Overs_Bowled'])
+    
+    # === CATEGORY 6: EXTRAS & DISCIPLINE (from CSV) ===
+    stats['Total_Wides'] = int(volume_row['Total_Wides'])
+    stats['Total_No_Balls'] = int(volume_row['Total_No_Balls'])
+    stats['Total_Extras'] = stats['Total_Wides'] + stats['Total_No_Balls']
+    
+    # CALCULATE percentages
+    stats['Extras_Percentage'] = safe_divide(stats['Total_Extras'] * 100, stats['Total_Balls_Bowled'])
+    stats['Wides_Per_Innings'] = safe_divide(stats['Total_Wides'], stats['Total_Innings_Bowled'])
+    stats['NoBalls_Per_Innings'] = safe_divide(stats['Total_No_Balls'], stats['Total_Innings_Bowled'])
+    stats['Discipline_Score'] = 100 - stats['Extras_Percentage']
+    
+    # === CATEGORY 7: EXPENSIVE OVERS ===
+    stats['Most_Runs_Conceded_Innings'] = int(volume_row.get('Most_Runs_Conceded_Innings', 0))
+    
+    # Count expensive innings (estimate - no per-innings economy data)
+    stats['Count_Expensive_Innings'] = 0  # No data available
+    stats['Expensive_Innings_Rate'] = 0.0
+    
+    # === CATEGORY 8: CONSISTENCY ===
+    # No ball-by-ball data for debuts
+    stats['Wickets_Std_Deviation'] = 0.0
+    stats['Economy_CV'] = 0.0
+    
+    # CALCULATE percentages
+    stats['Percentage_Wicketless'] = 0.0  # No per-innings data
+    stats['Percentage_3_Plus_Wickets'] = safe_divide(stats['Count_3_Wickets'] * 100, stats['Total_Innings_Bowled'])
+    
+    # === CATEGORY 9: PHASE-SPECIFIC ===
+    # No ball-by-ball data for debuts - set to 0
+    stats['Powerplay_Overs'] = 0.0
+    stats['Powerplay_Runs'] = 0
+    stats['Powerplay_Wickets'] = 0
+    stats['Powerplay_Economy'] = 0.0
+    
+    stats['Death_Overs'] = 0.0
+    stats['Death_Runs'] = 0
+    stats['Death_Wickets'] = 0
+    stats['Death_Overs_Economy'] = 0.0
+    
+    # === CATEGORY 10: IMPACT SCORE ===
+    stats['Impact_Score'] = (stats['Total_Wickets'] * 30) - (stats['Economy_Rate'] * 5)
+    stats['Wicket_Taking_Ability'] = safe_divide(stats['Avg_Wickets_Per_Innings'] * 100, stats['Bowling_Strike_Rate'])
+    
+    return stats
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION B: DEBUT PROCESSING FUNCTION
+# ADD THIS FUNCTION AFTER THE TWO CALCULATION FUNCTIONS
+# ═══════════════════════════════════════════════════════════════════════════
+
+def process_debut_players_with_data(debut_players, debut_batting_df, debut_bowling_df, batting_stats_list, bowling_stats_list):
+    """Process debut players using pre-collected data from CSV files"""
+    print_progress(f"Processing {len(debut_players)} debut players...")
+    
+    batting_found = 0
+    batting_missing = 0
+    bowling_found = 0
+    bowling_missing = 0
+    
+    for idx, player_row in debut_players.iterrows():
+        player_name = player_row['2025_FullName']
+        player_type = player_row['Player_Type'].strip()
+        
+        # === BATTING STATS ===
+        if player_type in ['Batter', 'WK-Batter', 'All-Rounder']:
+            if len(debut_batting_df) > 0:
+                # Try to find player in debut_batting.csv
+                debut_data = debut_batting_df[debut_batting_df['Player_Name'] == player_name]
+                
+                if len(debut_data) > 0:
+                    # Found data - calculate derived metrics
+                    bat_stats = calculate_derived_batting_stats(debut_data.iloc[0], player_row)
+                    batting_found += 1
+                else:
+                    # Not found - use zeros as fallback
+                    print_warning(f"  Batting data not found for: {player_name} (using zeros)")
+                    bat_stats = create_empty_batting_stats(player_row)
+                    batting_missing += 1
+            else:
+                # No debut CSV loaded - use zeros
+                bat_stats = create_empty_batting_stats(player_row)
+                batting_missing += 1
+            
+            batting_stats_list.append(bat_stats)
+        
+        # === BOWLING STATS ===
+        if player_type in ['Bowler', 'All-Rounder']:
+            if len(debut_bowling_df) > 0:
+                # Try to find player in debut_bowling.csv
+                debut_data = debut_bowling_df[debut_bowling_df['Player_Name'] == player_name]
+                
+                if len(debut_data) > 0:
+                    # Found data - calculate derived metrics
+                    bowl_stats = calculate_derived_bowling_stats(debut_data.iloc[0], player_row)
+                    bowling_found += 1
+                else:
+                    # Not found - use zeros as fallback
+                    print_warning(f"  Bowling data not found for: {player_name} (using zeros)")
+                    bowl_stats = create_empty_bowling_stats(player_row)
+                    bowling_missing += 1
+            else:
+                # No debut CSV loaded - use zeros
+                bowl_stats = create_empty_bowling_stats(player_row)
+                bowling_missing += 1
+            
+            bowling_stats_list.append(bowl_stats)
+    
+    # Summary
+    print_success(f"Processed {len(debut_players)} debut players")
+    print_progress(f"  Batting: {batting_found} with data, {batting_missing} with zeros")
+    print_progress(f"  Bowling: {bowling_found} with data, {bowling_missing} with zeros")
+    
+    return batting_stats_list, bowling_stats_list
 
 # ═══════════════════════════════════════════════════════════════════════════
 # BOWLING STATISTICS CALCULATION
@@ -750,22 +1075,17 @@ def process_all_players(data):
     
     print_success(f"Processed {len(current_players)} current players")
     
-    # Process debut players
-    print_progress(f"Processing {len(debut_players)} debut players...")
+    # Process debut players (NEW METHOD WITH REAL DATA)
+    debut_batting_df = data.get('debut_batting_stats', pd.DataFrame())
+    debut_bowling_df = data.get('debut_bowling_stats', pd.DataFrame())
     
-    for idx, player_row in debut_players.iterrows():
-        player_type = player_row['Player_Type'].strip()
-        
-        # Create empty stats
-        if player_type in ['Batter', 'WK-Batter', 'All-Rounder']:
-            bat_stats = create_empty_batting_stats(player_row)
-            batting_stats_list.append(bat_stats)
-        
-        if player_type in ['Bowler', 'All-Rounder']:
-            bowl_stats = create_empty_bowling_stats(player_row)
-            bowling_stats_list.append(bowl_stats)
-    
-    print_success(f"Processed {len(debut_players)} debut players")
+    batting_stats_list, bowling_stats_list = process_debut_players_with_data(
+        debut_players,
+        debut_batting_df,
+        debut_bowling_df,
+        batting_stats_list,
+        bowling_stats_list
+    )
     
     # Create DataFrames
     batting_master = pd.DataFrame(batting_stats_list)
