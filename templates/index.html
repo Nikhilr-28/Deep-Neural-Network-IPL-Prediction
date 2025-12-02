@@ -233,31 +233,10 @@
             <div id="step-1" class="step-content active">
               <div class="grid md:grid-cols-2 gap-6">
                 <!-- Column 1: Match Meta & Teams -->
-                <div class="space-y-4">
-                  <div class="space-y-2">
-                    <label class="block text-[11px] text-slate-400"
-                      >League & Season</label
-                    >
-                    <div class="flex gap-2">
-                      <select
-                        class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px] focus:outline-none focus:border-emerald-500"
-                      >
-                        <option>IPL</option>
-                        <option>T20I</option>
-                        <option>BBL</option>
-                        <option>CPL</option>
-                      </select>
-                      <select
-                        class="w-24 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]"
-                      >
-                        <option>2024</option>
-                        <option>2023</option>
-                        <option>2022</option>
-                      </select>
-                    </div>
-                  </div>
+                <!-- REPLACE LINES 236-318 in your index.html with this cleaned version -->
 
-                  <!-- Fixture -->
+                <div class="space-y-4">
+                  <!-- Fixture (Team 1 vs Team 2) -->
                   <div class="space-y-2">
                     <label class="block text-[11px] text-slate-400"
                       >Fixture (Team 1 vs Team 2)</label
@@ -268,7 +247,9 @@
                       <select
                         id="team1-select"
                         class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]"
-                      ></select>
+                      >
+                        <option>Loading teams...</option>
+                      </select>
 
                       <span class="text-[11px] text-slate-500 text-center"
                         >vs</span
@@ -277,9 +258,12 @@
                       <select
                         id="team2-select"
                         class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]"
-                      ></select>
+                      >
+                        <option>Loading teams...</option>
+                      </select>
                     </div>
                   </div>
+
                   <!-- Venue (autofilled from Team 1) -->
                   <div class="space-y-2">
                     <label class="block text-[11px] text-slate-400"
@@ -288,7 +272,9 @@
                     <select
                       id="venue-select"
                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]"
-                    ></select>
+                    >
+                      <option>Select team first</option>
+                    </select>
                   </div>
 
                   <div class="grid grid-cols-2 gap-2">
@@ -334,7 +320,6 @@
                     </p>
                   </div>
                 </div>
-
                 <!-- Column 2: Context Sliders (With Toggles) -->
                 <div class="space-y-3">
                   <label class="block text-[11px] text-slate-400"
@@ -926,7 +911,6 @@
 
     <!-- Logic -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     <script>
       let TEAM_LIST = [];
       let TEAM_META = {};
@@ -1265,5 +1249,6 @@
         fetchMeta();
       });
     </script>
+    <script src="{{ url_for('static', filename='js/player_autopop.js') }}"></script>
   </body>
 </html>
