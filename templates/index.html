@@ -24,13 +24,113 @@
           transform: translateY(0);
         }
       }
-      /* Custom toggle styles */
       .toggle-checkbox:checked {
         right: 0;
         border-color: #10b981;
       }
       .toggle-checkbox:checked + .toggle-label {
         background-color: #10b981;
+      }
+
+      /* ADD THIS TO YOUR EXISTING <style> SECTION */
+
+      /* Player Selection */
+      .player-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 0.75rem;
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 0.5rem;
+      }
+
+      .player-card {
+        background: #1e293b;
+        border: 2px solid transparent;
+        border-radius: 0.75rem;
+        padding: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .player-card:hover {
+        background: #334155;
+      }
+      .player-card:has(input:checked) {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.1);
+      }
+
+      .player-card input {
+        display: none;
+      }
+
+      .player-name {
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+        color: #e2e8f0;
+      }
+
+      .player-ovr {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #10b981;
+        margin-bottom: 0.25rem;
+      }
+
+      .player-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .player-badge.BATTER {
+        background: rgba(59, 130, 246, 0.2);
+        color: #60a5fa;
+      }
+      .player-badge.BOWLER {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+      }
+      .player-badge.ALLROUNDER {
+        background: rgba(168, 85, 247, 0.2);
+        color: #c084fc;
+      }
+      .player-badge.WKBATTER {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fbbf24;
+      }
+
+      /* Composition Counter */
+      .composition-counter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        background: #0f172a;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.75rem;
+      }
+
+      .counter-item,
+      .total-count {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .counter-item.complete,
+      .total-count.complete {
+        color: #10b981;
+      }
+      .counter-item.incomplete,
+      .total-count.incomplete {
+        color: #ef4444;
       }
     </style>
   </head>
@@ -129,7 +229,7 @@
               </div>
             </div>
 
-            <!-- STEP 1: MATCH CONTEXT & TEAMS (Moved from Step 2) -->
+            <!-- STEP 1: MATCH CONTEXT & TEAMS -->
             <div id="step-1" class="step-content active">
               <div class="grid md:grid-cols-2 gap-6">
                 <!-- Column 1: Match Meta & Teams -->
@@ -157,7 +257,7 @@
                     </div>
                   </div>
 
-                  <!-- REORDERED: Fixture now above Venue -->
+                  <!-- Fixture -->
                   <div class="space-y-2">
                     <label class="block text-[11px] text-slate-400"
                       >Fixture (Team 1 vs Team 2)</label
@@ -167,38 +267,28 @@
                     >
                       <select
                         id="team1-select"
-                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px] focus:outline-none focus:border-emerald-500"
-                      >
-                        <option value="KKR">KKR</option>
-                        <option value="MI">MI</option>
-                        <option value="CSK">CSK</option>
-                      </select>
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]"
+                      ></select>
+
                       <span class="text-[11px] text-slate-500 text-center"
                         >vs</span
                       >
+
                       <select
                         id="team2-select"
-                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px] focus:outline-none focus:border-emerald-500"
-                      >
-                        <option value="RCB">RCB</option>
-                        <option value="SRH">SRH</option>
-                        <option value="DC">DC</option>
-                      </select>
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]"
+                      ></select>
                     </div>
                   </div>
-
+                  <!-- Venue (autofilled from Team 1) -->
                   <div class="space-y-2">
                     <label class="block text-[11px] text-slate-400"
                       >Venue</label
                     >
                     <select
+                      id="venue-select"
                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-[11px]"
-                    >
-                      <option>Eden Gardens · Kolkata</option>
-                      <option>Chinnaswamy · Bengaluru</option>
-                      <option>Wankhede · Mumbai</option>
-                      <option>Dharamshala · HPCA</option>
-                    </select>
+                    ></select>
                   </div>
 
                   <div class="grid grid-cols-2 gap-2">
@@ -227,7 +317,7 @@
                     </div>
                   </div>
 
-                  <!-- NEW: Innings / Match Phase Selector -->
+                  <!-- Match Phase Selector -->
                   <div class="space-y-2 pt-1 border-t border-slate-800">
                     <label class="block text-[11px] text-slate-400"
                       >Match Phase Prediction</label
@@ -417,7 +507,7 @@
               </div>
             </div>
 
-            <!-- STEP 2: SQUAD EDITOR (Moved from Step 1) -->
+            <!-- STEP 2: SQUAD EDITOR -->
             <div id="step-2" class="step-content">
               <div class="grid lg:grid-cols-2 gap-6">
                 <!-- Squad Info & Add Player -->
@@ -430,8 +520,9 @@
                     </h3>
                     <p class="text-[11px] text-slate-400">
                       Adjusting squad availability for
-                      <span class="text-white font-medium">KKR vs RCB</span>.
-                      Impact player rules are active.
+                      <span class="text-white font-medium"
+                        >Team 1 vs Team 2</span
+                      >. Impact player rules are active.
                     </p>
                   </div>
 
@@ -441,204 +532,36 @@
                   >
                     <label
                       class="block text-[11px] text-slate-300 font-semibold mb-2"
-                      >Add Player to Squad</label
                     >
+                      Add Player to Squad
+                    </label>
+
                     <div class="flex flex-col sm:flex-row gap-2 mb-3">
                       <input
                         type="text"
-                        id="new-player-name"
-                        placeholder="Search Player (e.g. Travis Head)"
-                        value="Travis Head"
-                        class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-[11px] focus:outline-none focus:border-emerald-500"
+                        id="player-search"
+                        placeholder="Search Player..."
+                        class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-[11px]"
                       />
+
                       <select
                         id="new-player-team"
-                        class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-2 text-[11px] w-full sm:w-32 focus:outline-none focus:border-emerald-500"
+                        class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-2 text-[11px] w-full sm:w-32"
                       >
                         <option value="1">Team 1</option>
                         <option value="2">Team 2</option>
                       </select>
                     </div>
 
-                    <!-- DEMO PLAYER STATS CARD -->
-                    <div
-                      class="bg-slate-900 border border-slate-700 rounded-lg p-3 flex items-center justify-between animate-pulse-once"
-                    >
-                      <div class="flex items-center gap-3">
-                        <div
-                          class="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-400"
-                        >
-                          TH
-                        </div>
-                        <div>
-                          <div class="text-xs font-semibold text-white">
-                            Travis Head
-                          </div>
-                          <div class="text-[10px] text-slate-400 flex gap-2">
-                            <span>Bat: LHB</span>
-                            <span class="text-emerald-400">SR: 192.5</span>
-                            <span>Avg: 41.2</span>
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        onclick="addPlayer()"
-                        class="px-3 py-1.5 rounded-lg bg-emerald-600 text-[10px] text-slate-950 font-medium hover:bg-emerald-500 whitespace-nowrap"
-                      >
-                        + Add
-                      </button>
-                    </div>
+                    <div id="player-search-results" class="space-y-1"></div>
                   </div>
                 </div>
 
                 <!-- Rosters -->
                 <div class="grid grid-cols-2 gap-3">
-                  <!-- Team 1 List -->
-                  <div
-                    class="bg-slate-950/30 border border-slate-800 rounded-xl p-3 h-64 overflow-y-auto"
-                  >
-                    <div
-                      class="text-[11px] font-semibold text-emerald-400 mb-2 sticky top-0 bg-slate-950/0 backdrop-blur-sm"
-                    >
-                      Team 1 Squad
-                    </div>
-                    <div id="team1-list" class="space-y-1">
-                      <!-- Items populated by JS or static -->
-                      <div
-                        class="group flex items-center justify-between bg-slate-900 px-2 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700"
-                      >
-                        <span class="text-slate-200 text-[11px]"
-                          >Sunil Narine</span
-                        >
-                        <div class="hidden group-hover:flex items-center gap-1">
-                          <button
-                            class="text-[9px] text-slate-400 hover:text-white"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            class="text-[9px] text-red-400 hover:text-red-300"
-                            onclick="this.parentElement.parentElement.remove()"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                      <div
-                        class="group flex items-center justify-between bg-slate-900 px-2 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700"
-                      >
-                        <span class="text-slate-200 text-[11px]"
-                          >Andre Russell</span
-                        >
-                        <div class="hidden group-hover:flex items-center gap-1">
-                          <button
-                            class="text-[9px] text-slate-400 hover:text-white"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            class="text-[9px] text-red-400 hover:text-red-300"
-                            onclick="this.parentElement.parentElement.remove()"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                      <div
-                        class="group flex items-center justify-between bg-slate-900 px-2 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700"
-                      >
-                        <span class="text-slate-200 text-[11px]"
-                          >Shreyas Iyer</span
-                        >
-                        <div class="hidden group-hover:flex items-center gap-1">
-                          <button
-                            class="text-[9px] text-slate-400 hover:text-white"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            class="text-[9px] text-red-400 hover:text-red-300"
-                            onclick="this.parentElement.parentElement.remove()"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <div id="team1-list" class="space-y-1"></div>
 
-                  <!-- Team 2 List -->
-                  <div
-                    class="bg-slate-950/30 border border-slate-800 rounded-xl p-3 h-64 overflow-y-auto"
-                  >
-                    <div
-                      class="text-[11px] font-semibold text-sky-400 mb-2 sticky top-0 bg-slate-950/0 backdrop-blur-sm"
-                    >
-                      Team 2 Squad
-                    </div>
-                    <div id="team2-list" class="space-y-1">
-                      <div
-                        class="group flex items-center justify-between bg-slate-900 px-2 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700"
-                      >
-                        <span class="text-slate-200 text-[11px]"
-                          >Virat Kohli</span
-                        >
-                        <div class="hidden group-hover:flex items-center gap-1">
-                          <button
-                            class="text-[9px] text-slate-400 hover:text-white"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            class="text-[9px] text-red-400 hover:text-red-300"
-                            onclick="this.parentElement.parentElement.remove()"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                      <div
-                        class="group flex items-center justify-between bg-slate-900 px-2 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700"
-                      >
-                        <span class="text-slate-200 text-[11px]"
-                          >Faf du Plessis</span
-                        >
-                        <div class="hidden group-hover:flex items-center gap-1">
-                          <button
-                            class="text-[9px] text-slate-400 hover:text-white"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            class="text-[9px] text-red-400 hover:text-red-300"
-                            onclick="this.parentElement.parentElement.remove()"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                      <div
-                        class="group flex items-center justify-between bg-slate-900 px-2 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700"
-                      >
-                        <span class="text-slate-200 text-[11px]"
-                          >Glenn Maxwell</span
-                        >
-                        <div class="hidden group-hover:flex items-center gap-1">
-                          <button
-                            class="text-[9px] text-slate-400 hover:text-white"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            class="text-[9px] text-red-400 hover:text-red-300"
-                            onclick="this.parentElement.parentElement.remove()"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <div id="team2-list" class="space-y-1"></div>
                 </div>
               </div>
 
@@ -657,7 +580,7 @@
                     Reset
                   </button>
                   <button
-                    onclick="goToStep(3)"
+                    onclick="runPrediction()"
                     class="px-6 py-2 rounded-lg bg-emerald-500 text-slate-950 text-xs font-semibold hover:bg-emerald-400 transition shadow-lg shadow-emerald-900/20"
                   >
                     Run Prediction &rarr;
@@ -683,7 +606,7 @@
                     <span
                       class="inline-flex items-center rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 text-[10px] text-emerald-300 font-medium"
                     >
-                      Confidence: High (74.1% Backtest)
+                      Confidence: Model-based
                     </span>
                   </div>
 
@@ -695,19 +618,21 @@
                       class="flex-1 flex flex-col justify-center items-center bg-gradient-to-r from-emerald-500/20 to-emerald-500/5 relative group cursor-pointer transition-colors hover:from-emerald-500/25"
                     >
                       <div
+                        id="result-team1"
                         class="text-[11px] text-emerald-300 uppercase tracking-widest font-semibold mb-1"
                       >
-                        Team 1 · KKR
+                        Team 1
                       </div>
                       <div
+                        id="result-prob-a"
                         class="text-5xl font-bold tracking-tighter text-slate-50"
                       >
-                        68<span class="text-2xl text-emerald-400">%</span>
+                        0<span class="text-2xl text-emerald-400">%</span>
                       </div>
                       <div
                         class="mt-2 text-[11px] text-emerald-200 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20"
                       >
-                        Favoured · Toss Pending
+                        Favoured · Model Output
                       </div>
                     </div>
 
@@ -722,22 +647,24 @@
                       </div>
                     </div>
 
-                    <!-- Right Side (Loser) -->
+                    <!-- Right Side -->
                     <div
                       class="flex-1 flex flex-col justify-center items-center bg-gradient-to-l from-sky-500/10 to-sky-500/0 relative group cursor-pointer transition-colors hover:from-sky-500/15"
                     >
                       <div
+                        id="result-team2"
                         class="text-[11px] text-sky-300 uppercase tracking-widest font-semibold mb-1"
                       >
-                        Team 2 · RCB
+                        Team 2
                       </div>
                       <div
+                        id="result-prob-b"
                         class="text-5xl font-bold tracking-tighter text-slate-400"
                       >
-                        32<span class="text-2xl text-slate-500">%</span>
+                        0<span class="text-2xl text-slate-500">%</span>
                       </div>
                       <div class="mt-2 text-[11px] text-slate-500">
-                        Underdog · Form improving
+                        Underdog · Model Output
                       </div>
                     </div>
                   </div>
@@ -745,7 +672,7 @@
 
                 <!-- Analysis Grid -->
                 <div class="grid md:grid-cols-2 gap-6">
-                  <!-- Drivers -->
+                  <!-- Drivers (static for now) -->
                   <div>
                     <div class="flex items-center justify-between text-xs mb-3">
                       <span class="text-slate-300 font-medium"
@@ -764,7 +691,7 @@
                             Powerplay SR differential
                           </div>
                           <div class="text-[10px] text-slate-500">
-                            KKR +41.2 vs league average
+                            Model-driven factor
                           </div>
                         </div>
                         <span class="text-emerald-300 font-bold text-xs"
@@ -776,10 +703,10 @@
                       >
                         <div>
                           <div class="text-slate-200 text-[11px] font-medium">
-                            Death overs economy (KKR)
+                            Death overs economy
                           </div>
                           <div class="text-[10px] text-slate-500">
-                            Starc 7.8 vs league 9.2
+                            Bowling impact on win prob.
                           </div>
                         </div>
                         <span class="text-emerald-300 font-bold text-xs"
@@ -791,10 +718,10 @@
                       >
                         <div>
                           <div class="text-slate-200 text-[11px] font-medium">
-                            Recent form · Kohli
+                            Recent form · Key batter
                           </div>
                           <div class="text-[10px] text-slate-500">
-                            Avg 54.8 last 5 innings
+                            Form impact on win prob.
                           </div>
                         </div>
                         <span class="text-red-300 font-bold text-xs"
@@ -804,7 +731,7 @@
                     </ul>
                   </div>
 
-                  <!-- Calibration & Meta -->
+                  <!-- Calibration & Meta (static for now) -->
                   <div
                     class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col justify-between"
                   >
@@ -818,12 +745,12 @@
                             class="flex justify-between text-[10px] text-slate-400 mb-1"
                           >
                             <span>Brier Score</span>
-                            <span>0.18 (Good)</span>
+                            <span>Good</span>
                           </div>
                           <div
                             class="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden"
                           >
-                            <div class="h-full bg-emerald-500 w-[82%]"></div>
+                            <div class="h-full bg-emerald-500 w-[80%]"></div>
                           </div>
                         </div>
                         <div>
@@ -831,12 +758,12 @@
                             class="flex justify-between text-[10px] text-slate-400 mb-1"
                           >
                             <span>Data Quality</span>
-                            <span>98% Coverage</span>
+                            <span>High Coverage</span>
                           </div>
                           <div
                             class="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden"
                           >
-                            <div class="h-full bg-sky-500 w-[98%]"></div>
+                            <div class="h-full bg-sky-500 w-[95%]"></div>
                           </div>
                         </div>
                       </div>
@@ -869,7 +796,7 @@
           </div>
         </section>
 
-        <!-- Middle Row: Momentum & PvP Matchups (Existing content kept for context) -->
+        <!-- Middle Row: Momentum & PvP Matchups -->
         <section class="grid lg:grid-cols-3 gap-4">
           <!-- Momentum chart placeholder -->
           <div
@@ -891,7 +818,6 @@
               class="mt-1 bg-slate-950 border border-slate-800 rounded-2xl h-48 flex flex-col justify-between p-3"
             >
               <div class="flex-1 flex items-end gap-1">
-                <!-- simple spark lines / bars as placeholder -->
                 <div class="flex-1 flex items-end gap-1 opacity-80">
                   <div class="w-1 bg-emerald-500/40 h-6 rounded-full"></div>
                   <div class="w-1 bg-emerald-500/50 h-8 rounded-full"></div>
@@ -998,20 +924,287 @@
       </main>
     </div>
 
-    <!-- Logic for Tabs/Wizard -->
+    <!-- Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     <script>
+      let TEAM_LIST = [];
+      let TEAM_META = {};
+      const PLAYERS_CACHE = {}; // cache by actual IPL team code
+
+      /* ============================================================
+     FETCH TEAMS + HOME GROUNDS
+  ============================================================ */
+      async function fetchMeta() {
+        try {
+          const res = await fetch("/meta/teams");
+          const data = await res.json();
+
+          // Backend returns { teams: [...], grounds: { TEAM: { home_grounds: [...] } } }
+          TEAM_LIST = data.teams || [];
+          TEAM_META = data.grounds || data.home_grounds || {};
+
+          populateTeams();
+        } catch (err) {
+          console.error("❌ Failed loading /meta/teams", err);
+        }
+      }
+
+      /* ============================================================
+     POPULATE TEAM DROPDOWNS
+  ============================================================ */
+      function populateTeams() {
+        const t1 = document.getElementById("team1-select");
+        const t2 = document.getElementById("team2-select");
+
+        if (!t1 || !t2 || !TEAM_LIST.length) return;
+
+        t1.innerHTML = "";
+        t2.innerHTML = "";
+
+        TEAM_LIST.forEach((team) => {
+          const opt1 = document.createElement("option");
+          opt1.value = team;
+          opt1.textContent = team;
+          t1.appendChild(opt1);
+
+          const opt2 = document.createElement("option");
+          opt2.value = team;
+          opt2.textContent = team;
+          t2.appendChild(opt2);
+        });
+
+        // Default: first two distinct teams if possible
+        t1.selectedIndex = 0;
+        if (TEAM_LIST.length > 1) {
+          t2.selectedIndex = 1;
+        }
+
+        // When Team 1 changes, update venue and clear squads
+        t1.addEventListener("change", () => {
+          updateVenue();
+          clearSquads();
+          clearPlayerCache();
+        });
+
+        // When Team 2 changes, clear its squad + cache
+        t2.addEventListener("change", () => {
+          clearSquads();
+          clearPlayerCache();
+        });
+
+        updateVenue();
+      }
+
+      /* ============================================================
+     VENUE SELECTOR BASED ON TEAM 1
+  ============================================================ */
+      function updateVenue() {
+        const team = document.getElementById("team1-select").value;
+        const venue = document.getElementById("venue-select");
+
+        if (!venue) return;
+
+        const meta = TEAM_META[team];
+        const grounds =
+          meta && meta.home_grounds && meta.home_grounds.length
+            ? meta.home_grounds
+            : ["Neutral venue"];
+
+        venue.innerHTML = "";
+        grounds.forEach((g) => {
+          const opt = document.createElement("option");
+          opt.textContent = g;
+          venue.appendChild(opt);
+        });
+      }
+
+      function clearSquads() {
+        const t1 = document.getElementById("team1-list");
+        const t2 = document.getElementById("team2-list");
+        if (t1) t1.innerHTML = "";
+        if (t2) t2.innerHTML = "";
+      }
+
+      function clearPlayerCache() {
+        for (const key in PLAYERS_CACHE) {
+          delete PLAYERS_CACHE[key];
+        }
+      }
+
+      /* ============================================================
+     FETCH PLAYERS FOR IPL TEAM (WITH MINIMAL STATS)
+  ============================================================ */
+      async function fetchPlayersForTeam(actualTeam) {
+        if (!actualTeam) return [];
+
+        if (PLAYERS_CACHE[actualTeam]) return PLAYERS_CACHE[actualTeam];
+
+        const res = await fetch(
+          `/meta/players/${encodeURIComponent(actualTeam)}`
+        );
+        const data = await res.json();
+
+        let players = data.players || [];
+
+        // Normalize: if backend returns strings, wrap as {name: "..."}
+        if (players.length && typeof players[0] === "string") {
+          players = players.map((name) => ({ name }));
+        }
+
+        PLAYERS_CACHE[actualTeam] = players;
+        return players;
+      }
+
+      /* ============================================================
+     PLAYER SEARCH (STEP 2)
+  ============================================================ */
+      async function handlePlayerSearch(e) {
+        const query = e.target.value.trim().toLowerCase();
+        const resultsBox = document.getElementById("player-search-results");
+        const sideSelect = document.getElementById("new-player-team");
+        const team1Select = document.getElementById("team1-select");
+        const team2Select = document.getElementById("team2-select");
+
+        if (!resultsBox || !sideSelect || !team1Select || !team2Select) return;
+
+        resultsBox.innerHTML = "";
+        if (query.length < 2) return;
+
+        const squadSide = sideSelect.value; // "1" or "2"
+        const actualTeam =
+          squadSide === "1" ? team1Select.value : team2Select.value;
+
+        const players = await fetchPlayersForTeam(actualTeam);
+        const filtered = players.filter((p) =>
+          (p.name || "").toLowerCase().includes(query)
+        );
+
+        filtered.forEach((p) => {
+          const name = p.name || "";
+          const type = p.type || p.Player_Type || "";
+          const bat = p.bat_ovr ?? p.BASE_OVR_bat ?? p.BASE_OVR ?? null;
+          const bowl = p.bowl_ovr ?? p.BASE_OVR_bowl ?? null;
+
+          const card = document.createElement("div");
+          card.className =
+            "flex justify-between items-center bg-slate-900 p-2 rounded border border-slate-700";
+
+          const left = document.createElement("div");
+          const title = document.createElement("div");
+          title.className = "text-[11px] text-slate-100";
+          title.textContent = name;
+
+          const meta = document.createElement("div");
+          meta.className = "text-[10px] text-slate-400 mt-0.5";
+
+          const batText =
+            bat != null ? `Bat OVR: ${bat.toFixed(1)}` : "Bat OVR: —";
+          const bowlText =
+            bowl != null ? `Bowl OVR: ${bowl.toFixed(1)}` : "Bowl OVR: —";
+
+          meta.textContent = [type || "Role: N/A", batText, bowlText].join(
+            " · "
+          );
+
+          left.appendChild(title);
+          left.appendChild(meta);
+
+          const btn = document.createElement("button");
+          btn.className = "text-emerald-400 text-[10px]";
+          btn.textContent = "Add";
+          btn.onclick = () => {
+            addPlayerToSquad(name, squadSide);
+            resultsBox.innerHTML = "";
+            e.target.value = "";
+          };
+
+          card.appendChild(left);
+          card.appendChild(btn);
+          resultsBox.appendChild(card);
+        });
+      }
+
+      function updateResultScreen(out) {
+        const t1 = document.getElementById("result-team1");
+        const t2 = document.getElementById("result-team2");
+        const pA = document.getElementById("result-prob-a");
+        const pB = document.getElementById("result-prob-b");
+
+        if (!out || !out.team_a || !out.team_b) {
+          console.error("❌ Invalid prediction result", out);
+          return;
+        }
+
+        const probA = out.prob_a * 100;
+        const probB = out.prob_b * 100;
+
+        t1.textContent = out.team_a;
+        t2.textContent = out.team_b;
+
+        pA.innerHTML = `${probA}<span class="text-2xl text-emerald-400">%</span>`;
+        pB.innerHTML = `${probB}<span class="text-2xl text-sky-400">%</span>`;
+
+        // Winner highlight (left or right)
+        const leftCard = document.querySelector("#result-prob-a").parentElement;
+        const rightCard =
+          document.querySelector("#result-prob-b").parentElement;
+
+        if (probA > probB) {
+          leftCard.classList.add("from-emerald-500/25");
+          rightCard.classList.remove("from-sky-500/15");
+        } else {
+          rightCard.classList.add("from-sky-500/15");
+          leftCard.classList.remove("from-emerald-500/25");
+        }
+      }
+
+      function addPlayerToSquad(name, squadSide) {
+        const listId = squadSide === "1" ? "team1-list" : "team2-list";
+        const list = document.getElementById(listId);
+        if (!list || !name) return;
+
+        const div = document.createElement("div");
+        div.className =
+          "group flex items-center justify-between bg-slate-900 px-2 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700";
+
+        div.innerHTML = `
+      <span class="text-slate-200 text-[11px]">${name}</span>
+      <div class="hidden group-hover:flex items-center gap-1">
+        <button
+          class="text-[9px] text-red-400 hover:text-red-300"
+          onclick="this.parentElement.parentElement.remove()"
+        >
+          ×
+        </button>
+      </div>
+    `;
+
+        list.prepend(div);
+      }
+
+      /* ============================================================
+     STEP NAVIGATION
+  ============================================================ */
       function goToStep(step) {
-        // Hide all steps
         document
           .querySelectorAll(".step-content")
           .forEach((el) => el.classList.remove("active"));
 
-        // Show target step
-        document.getElementById(`step-${step}`).classList.add("active");
+        const target = document.getElementById(`step-${step}`);
+        if (target) target.classList.add("active");
 
-        // Update Dots
+        const titles = {
+          1: "Step 1 of 3: Match Context",
+          2: "Step 2 of 3: Configure Squads",
+          3: "Step 3 of 3: Analysis Result",
+        };
+        const desc = document.getElementById("wizard-desc");
+        if (desc && titles[step]) desc.innerText = titles[step];
+
         for (let i = 1; i <= 3; i++) {
           const dot = document.getElementById(`step-dot-${i}`);
+          if (!dot) continue;
           if (i === step) {
             dot.classList.remove("bg-slate-800", "w-2");
             dot.classList.add("bg-emerald-500", "w-8");
@@ -1020,66 +1213,57 @@
             dot.classList.add("bg-slate-800", "w-2");
           }
         }
-
-        // Update Text
-        const titles = {
-          1: "Step 1 of 3: Match Context",
-          2: "Step 2 of 3: Configure Squads",
-          3: "Step 3 of 3: Analysis Result",
-        };
-        document.getElementById("wizard-desc").innerText = titles[step];
       }
 
-      function addPlayer() {
-        const nameInput = document.getElementById("new-player-name");
-        const teamSelect = document.getElementById("new-player-team");
-        const name = nameInput.value.trim();
-        const team = teamSelect.value; // "1" or "2"
+      /* ============================================================
+     PREDICT BUTTON
+  ============================================================ */
+      async function runPrediction() {
+        const team_a = document.getElementById("team1-select").value;
+        const team_b = document.getElementById("team2-select").value;
 
-        if (!name) return;
+        const team_a_players = [
+          ...document.querySelectorAll("#team1-list span"),
+        ].map((e) => e.innerText);
 
-        const listId = team === "1" ? "team1-list" : "team2-list";
-        const listEl = document.getElementById(listId);
+        const team_b_players = [
+          ...document.querySelectorAll("#team2-list span"),
+        ].map((e) => e.innerText);
 
-        const div = document.createElement("div");
-        div.className =
-          "group flex items-center justify-between bg-slate-900 px-2 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700";
-        div.innerHTML = `
-              <span class="text-slate-200 text-[11px]">${name}</span>
-              <div class="hidden group-hover:flex items-center gap-1">
-                <button class="text-[9px] text-slate-400 hover:text-white">Edit</button>
-                <button class="text-[9px] text-red-400 hover:text-red-300" onclick="this.parentElement.parentElement.remove()">×</button>
-              </div>
-          `;
+        const res = await fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            team_a,
+            team_b,
+            players_a: team_a_players,
+            players_b: team_b_players,
+          }),
+        });
 
-        // Add animation
-        div.style.animation = "fadeIn 0.3s ease-out";
-        listEl.prepend(div);
+        const out = await res.json();
 
-        // Clear input
-        nameInput.value = "";
-        nameInput.focus();
+        // Debug JSON panel
+        const outEl = document.getElementById("real-prediction-json");
+        if (outEl) outEl.innerText = JSON.stringify(out, null, 2);
+
+        // 🔥 NEW: Update the main UI
+        updateResultScreen(out);
+
+        goToStep(3);
       }
 
-      function toggleContext(cardId, checkbox) {
-        const card = document.getElementById(cardId);
-        const wrapper = card.querySelector(".content-wrapper");
-        const status = card.querySelector('[id$="-status"]');
-
-        if (checkbox.checked) {
-          wrapper.classList.remove("opacity-40", "pointer-events-none");
-          // Restore status color - simplified logic for demo
-          if (cardId.includes("pitch"))
-            status.className = "text-[10px] text-emerald-300";
-          if (cardId.includes("dew"))
-            status.className = "text-[10px] text-sky-300";
-          if (cardId.includes("form"))
-            status.className = "text-[10px] text-slate-400";
-        } else {
-          wrapper.classList.add("opacity-40", "pointer-events-none");
-          status.className = "text-[10px] text-slate-600"; // Dim status text
+      /* ============================================================
+     PAGE INIT
+  ============================================================ */
+      document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("player-search");
+        if (searchInput) {
+          searchInput.addEventListener("input", handlePlayerSearch);
         }
-      }
+
+        fetchMeta();
+      });
     </script>
   </body>
 </html>

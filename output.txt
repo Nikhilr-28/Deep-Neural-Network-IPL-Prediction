@@ -1,0 +1,99 @@
+.
+├── app.py
+├── data_forge
+│   ├── dataset
+│   │   ├── atta
+│   │   │   ├── ATTA_BATSMAN_IPL.csv
+│   │   │   └── ATTA_BOWLERS_IPL.csv
+│   │   ├── gaurav
+│   │   │   ├── GAURAV_BATSMAN_IPL.csv
+│   │   │   └── GAURAV_BOWLERS_IPL.csv
+│   │   ├── IPL_BATSMAN.csv
+│   │   ├── IPL_BOWLERS.csv
+│   │   ├── IPL_TEAMS - PLAYER_2025.csv
+│   │   └── nikhil
+│   │       ├── NIKHIL_BOWLERS_IPL.csv
+│   │       └── NIKHIL_IPL_BATSMAN.csv
+│   └── notebook
+│       ├── data_splitter.ipynb
+│       └── dataset_template_creator..ipynb
+├── Nikhil
+│   ├── Dataset(s) and code
+│   │   ├── dataset
+│   │   │   ├── Clean_Nomenclature
+│   │   │   │   ├── current_players_2025_20251125_021101.csv
+│   │   │   │   ├── debut_batting.csv
+│   │   │   │   ├── debut_bowling.csv
+│   │   │   │   ├── debut_players_2025_20251125_021101.csv
+│   │   │   │   └── matching_report_20251125_021101.md
+│   │   │   ├── code
+│   │   │   │   ├── player_nomenclature.py
+│   │   │   │   └── sort_players.py
+│   │   │   ├── DL_MODELS
+│   │   │   │   ├── __pycache__
+│   │   │   │   │   ├── ipl_match_predictor.cpython-312.pyc
+│   │   │   │   │   └── ipl_match_predictor.cpython-313.pyc
+│   │   │   │   ├── 2025
+│   │   │   │   │   ├── first_10_matches.pdf
+│   │   │   │   │   ├── IPL_2025_FIXTURES.csv
+│   │   │   │   │   ├── IPL_2025_points_table.csv
+│   │   │   │   │   └── test_matches_10.json
+│   │   │   │   ├── app.py
+│   │   │   │   ├── best_model.pt
+│   │   │   │   ├── construct_training_data.py
+│   │   │   │   ├── gat_training.py
+│   │   │   │   ├── generate_team_phase_strengths.py
+│   │   │   │   ├── graphs.py
+│   │   │   │   ├── h2h_stats.py
+│   │   │   │   ├── ipl_match_predictor.py
+│   │   │   │   ├── outputs
+│   │   │   │   │   ├── best_3source_model.pt
+│   │   │   │   │   ├── gat_enhanced_pvp.json
+│   │   │   │   │   ├── gat_pvp_model.pt
+│   │   │   │   │   ├── team_h2h_matrix_2025.csv
+│   │   │   │   │   ├── team_phase_strengths_2025.csv
+│   │   │   │   │   ├── team_recent_form_2025.csv
+│   │   │   │   │   ├── training_matches_with_xi_20251201_053037.csv
+│   │   │   │   │   └── training_matches_with_xi_20251201_053037.json
+│   │   │   │   ├── recent_form.py
+│   │   │   │   ├── test_evaluation.py
+│   │   │   │   └── train_model.py
+│   │   │   ├── IPL_2025_Players_list_backup_20251125_015748.csv
+│   │   │   ├── IPL_2025_Players_list.csv
+│   │   │   ├── master
+│   │   │   │   ├── fix_master_phase_stats.py
+│   │   │   │   └── master_dataset_creation.py
+│   │   │   ├── Master_Datasets
+│   │   │   │   ├── BATTING_MASTER_2025_20251129_052900.csv
+│   │   │   │   ├── BATTING_MASTER_BACKUP_20251201_024443.csv
+│   │   │   │   ├── BOWLING_MASTER_2025_20251129_052900.csv
+│   │   │   │   ├── BOWLING_MASTER_BACKUP_20251201_024443.csv
+│   │   │   │   └── master_dataset_report_20251129_052900.md
+│   │   │   ├── OVR
+│   │   │   │   ├── calculate_ovr.py
+│   │   │   │   ├── OVR_CALCULATION_DOCUMENTATION.txt
+│   │   │   │   ├── PRE_OVR_BATTING_20251129_154628.csv
+│   │   │   │   └── PRE_OVR_BOWLING_20251129_154628.csv
+│   │   │   ├── poster_results.py
+│   │   │   ├── poster_visuals.py
+│   │   │   ├── pvp
+│   │   │   │   ├── pvp_extraction.py
+│   │   │   │   └── PVP_RAW_STATS_20251130_222935.json
+│   │   │   └── stadium_matching
+│   │   │       ├── BOWLER_TYPE_MAPPING_COMPLETE_170.csv
+│   │   │       ├── CITY_DEVIATION_BATTING_2022_2024.csv
+│   │   │       ├── city_deviation_batting.py
+│   │   │       ├── CITY_DEVIATION_BOWLING_2022_2024.csv
+│   │   │       ├── city_deviation_bowling.py
+│   │   │       ├── PACE_SPIN_MATCHUP_BATTING_2022_2024.csv
+│   │   │       ├── pace_spin_matchup_batting.py
+│   │   │       └── VENUE_TO_CITY_MAPPING.csv
+│   │   └── directory check
+│   │       ├── dir.py
+│   │       └── PROJECT_DIRECTORY_STRUCTURE.md
+│   └── requirements.txt
+├── output.txt
+└── templates
+    └── index.html
+
+23 directories, 74 files
