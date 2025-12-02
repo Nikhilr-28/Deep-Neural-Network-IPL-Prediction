@@ -964,18 +964,15 @@
           t2.selectedIndex = 1;
         }
 
-        // When Team 1 changes, update venue and clear squads
+        // When Team 1 changes, update venue only
+        // NOTE: player_autopop.js handles squad loading independently
         t1.addEventListener("change", () => {
           updateVenue();
-          clearSquads();
-          clearPlayerCache();
         });
 
-        // When Team 2 changes, clear its squad + cache
-        t2.addEventListener("change", () => {
-          clearSquads();
-          clearPlayerCache();
-        });
+        // Team 2 change handler
+        // NOTE: player_autopop.js handles squad loading independently
+        // No action needed here
 
         updateVenue();
       }

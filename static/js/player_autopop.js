@@ -1,200 +1,412 @@
-/**
- * AUTO-POPULATE PLAYERS - INJECTION SCRIPT
- * This script adds auto-population when teams are selected in Step 1
- * Add this BEFORE the closing </script> tag in your existing HTML
- */
+// ============================================================================
+// ULTRA-DEBUG VERSION - Find the exact issue
+// ============================================================================
 
-// =============================================================================
-// AUTO-POPULATE PLAYERS ON TEAM SELECTION
-// =============================================================================
+const TEAM_STATE = {
+  team1: { name: null, players: [], loaded: false, loading: false },
+  team2: { name: null, players: [], loaded: false, loading: false },
+};
 
-let team1PlayersCache = [];
-let team2PlayersCache = [];
+const DEFAULT_TEAM_1 = "MI";
+const DEFAULT_TEAM_2 = "CSK";
+const PLAYERS_PER_TEAM = 11;
 
-// Override the existing team selection handler
-document.addEventListener("DOMContentLoaded", function () {
-  console.log("🚀 Auto-populate players enabled");
+console.log("🚀 ULTRA-DEBUG VERSION LOADED");
 
-  // Hook into team1 selection
-  const team1Select = document.getElementById("team1-select");
-  if (team1Select) {
-    team1Select.addEventListener("change", async function () {
-      const team = this.value;
-      if (!team) return;
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
 
-      console.log(`Loading players for Team 1: ${team}`);
-      await loadAndPopulatePlayers(team, "team1-list", 1);
-    });
-  }
-
-  // Hook into team2 selection
-  const team2Select = document.getElementById("team2-select");
-  if (team2Select) {
-    team2Select.addEventListener("change", async function () {
-      const team = this.value;
-      if (!team) return;
-
-      console.log(`Loading players for Team 2: ${team}`);
-      await loadAndPopulatePlayers(team, "team2-list", 2);
-    });
-  }
-});
-
-/**
- * Load players from backend and populate the team list
- */
-async function loadAndPopulatePlayers(team, listId, teamNumber) {
-  try {
-    // Fetch players from backend (sorted by OVR)
-    const response = await fetch(`/api/players/${team}`);
-    const data = await response.json();
-
-    if (!data.success) {
-      console.error(`Failed to load players for ${team}:`, data.error);
-      return;
-    }
-
-    const players = data.players;
-    console.log(`✅ Loaded ${players.length} players for ${team}`);
-
-    // Cache players
-    if (teamNumber === 1) {
-      team1PlayersCache = players;
-    } else {
-      team2PlayersCache = players;
-    }
-
-    // Clear existing list
-    const listElement = document.getElementById(listId);
-    if (!listElement) {
-      console.error(`List element ${listId} not found`);
-      return;
-    }
-
-    listElement.innerHTML = "";
-
-    // Populate with ALL players (sorted by OVR descending)
-    players.forEach((player, index) => {
-      const div = document.createElement("div");
-      div.className =
-        "group flex items-center justify-between bg-slate-900 px-2 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700";
-
-      // Build OVR display
-      let ovrDisplay = "";
-      if (player.bat_ovr && player.bowl_ovr) {
-        ovrDisplay = `BAT: ${player.bat_ovr} | BOWL: ${player.bowl_ovr}`;
-      } else if (player.bat_ovr) {
-        ovrDisplay = `BAT: ${player.bat_ovr}`;
-      } else if (player.bowl_ovr) {
-        ovrDisplay = `BOWL: ${player.bowl_ovr}`;
-      } else {
-        ovrDisplay = `OVR: ${player.overall_ovr}`;
-      }
-
-      // Get category badge color
-      let badgeClass = "bg-slate-700 text-slate-300";
-      if (player.category === "BATTER") {
-        badgeClass = "bg-blue-500/20 text-blue-300";
-      } else if (player.category === "BOWLER") {
-        badgeClass = "bg-red-500/20 text-red-300";
-      } else if (player.category === "ALL-ROUNDER") {
-        badgeClass = "bg-purple-500/20 text-purple-300";
-      } else if (player.category === "WK-BATTER") {
-        badgeClass = "bg-amber-500/20 text-amber-300";
-      }
-
-      div.innerHTML = `
-                <div class="flex flex-col">
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-200 text-[11px] font-medium">${player.name}</span>
-                        <span class="text-[9px] px-1.5 py-0.5 rounded ${badgeClass}">${player.category}</span>
-                    </div>
-                    <div class="text-[10px] text-slate-400 mt-0.5">
-                        ${ovrDisplay} · Overall: ${player.overall_ovr}
-                    </div>
-                </div>
-                <div class="hidden group-hover:flex items-center gap-1">
-                    <button
-                        class="text-[9px] text-red-400 hover:text-red-300"
-                        onclick="this.parentElement.parentElement.remove()"
-                        title="Remove player"
-                    >
-                        ×
-                    </button>
-                </div>
-            `;
-
-      listElement.appendChild(div);
-    });
-
-    console.log(`✅ Populated ${players.length} players in ${listId}`);
-
-    // Show notification
-    showNotification(
-      `Loaded ${players.length} players for ${team} (sorted by OVR)`,
-      "success"
-    );
-  } catch (error) {
-    console.error("Error loading players:", error);
-    showNotification(`Failed to load players for ${team}`, "error");
-  }
-}
-
-/**
- * Show notification toast
- */
 function showNotification(message, type = "info") {
-  // Create toast element
-  const toast = document.createElement("div");
-  toast.className = `fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg text-sm font-medium z-50 transition-all duration-300 transform translate-y-0 opacity-100`;
-
-  // Set colors based on type
-  if (type === "success") {
-    toast.className += " bg-emerald-500 text-white";
-  } else if (type === "error") {
-    toast.className += " bg-red-500 text-white";
-  } else {
-    toast.className += " bg-slate-700 text-slate-100";
-  }
-
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  // Auto-remove after 3 seconds
+  const colors = {
+    success: "bg-green-500",
+    error: "bg-red-500",
+    info: "bg-blue-500",
+  };
+  const notification = document.createElement("div");
+  notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-300`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
   setTimeout(() => {
-    toast.classList.add("translate-y-2", "opacity-0");
-    setTimeout(() => toast.remove(), 300);
+    notification.style.opacity = "0";
+    setTimeout(() => notification.remove(), 300);
   }, 3000);
 }
 
-/**
- * Update runPrediction to use new API endpoint
- */
+function getCategoryBadge(category) {
+  const badges = {
+    BATTER:
+      '<span class="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-[10px] font-medium">BAT</span>',
+    BOWLER:
+      '<span class="px-2 py-0.5 bg-red-500/20 text-red-400 rounded text-[10px] font-medium">BOWL</span>',
+    "ALL-ROUNDER":
+      '<span class="px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded text-[10px] font-medium">AR</span>',
+    "WK-BATTER":
+      '<span class="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-[10px] font-medium">WK</span>',
+  };
+  return badges[category] || badges["ALL-ROUNDER"];
+}
+
+function logDOMState(context) {
+  console.log(`\n🔍 DOM STATE CHECK (${context}):`);
+  const team1List = document.getElementById("team1-list");
+  const team2List = document.getElementById("team2-list");
+  console.log(
+    `  Team 1 list children: ${team1List ? team1List.children.length : "NULL"}`
+  );
+  console.log(
+    `  Team 2 list children: ${team2List ? team2List.children.length : "NULL"}`
+  );
+  if (team1List && team1List.children.length > 0) {
+    console.log(
+      `  Team 1 first player: ${team1List.children[0].dataset.playerName}`
+    );
+  }
+  if (team2List && team2List.children.length > 0) {
+    console.log(
+      `  Team 2 first player: ${team2List.children[0].dataset.playerName}`
+    );
+  }
+}
+
+// ============================================================================
+// TEAM 1 HANDLER
+// ============================================================================
+
+function handleTeam1Change() {
+  console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log("🔵 TEAM 1 CHANGE EVENT FIRED");
+  logDOMState("BEFORE Team 1 change");
+
+  const team1Select = document.getElementById("team1-select");
+  if (!team1Select) {
+    console.error("❌ team1-select not found!");
+    return;
+  }
+
+  const selectedTeam = team1Select.value;
+  console.log(`  Selected: ${selectedTeam}`);
+  console.log(
+    `  Current state: ${TEAM_STATE.team1.name}, loaded: ${TEAM_STATE.team1.loaded}`
+  );
+
+  if (TEAM_STATE.team1.name === selectedTeam && TEAM_STATE.team1.loaded) {
+    console.log("✅ Team 1 already loaded, skipping");
+    return;
+  }
+
+  if (TEAM_STATE.team1.loading) {
+    console.log("⏳ Team 1 already loading, skipping");
+    return;
+  }
+
+  console.log("➡️ Loading Team 1...");
+  loadPlayersForTeam1(selectedTeam);
+}
+
+// ============================================================================
+// TEAM 2 HANDLER
+// ============================================================================
+
+function handleTeam2Change() {
+  console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log("🔴 TEAM 2 CHANGE EVENT FIRED");
+  logDOMState("BEFORE Team 2 change");
+
+  const team2Select = document.getElementById("team2-select");
+  if (!team2Select) {
+    console.error("❌ team2-select not found!");
+    return;
+  }
+
+  const selectedTeam = team2Select.value;
+  console.log(`  Selected: ${selectedTeam}`);
+  console.log(
+    `  Current state: ${TEAM_STATE.team2.name}, loaded: ${TEAM_STATE.team2.loaded}`
+  );
+
+  if (TEAM_STATE.team2.name === selectedTeam && TEAM_STATE.team2.loaded) {
+    console.log("✅ Team 2 already loaded, skipping");
+    return;
+  }
+
+  if (TEAM_STATE.team2.loading) {
+    console.log("⏳ Team 2 already loading, skipping");
+    return;
+  }
+
+  console.log("➡️ Loading Team 2...");
+  loadPlayersForTeam2(selectedTeam);
+}
+
+// ============================================================================
+// LOAD TEAM 1
+// ============================================================================
+
+async function loadPlayersForTeam1(team) {
+  console.log(`\n📥 [TEAM 1] Starting load for: ${team}`);
+
+  const listElement = document.getElementById("team1-list");
+  if (!listElement) {
+    console.error("❌ [TEAM 1] team1-list not found!");
+    return;
+  }
+
+  console.log(
+    `  [TEAM 1] List element found, current children: ${listElement.children.length}`
+  );
+  TEAM_STATE.team1.loading = true;
+
+  try {
+    const response = await fetch(`/meta/players/${team}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = await response.json();
+    if (!data.success || !data.players) throw new Error("Invalid response");
+
+    console.log(`✅ [TEAM 1] Fetched ${data.players.length} players`);
+
+    // Update state
+    TEAM_STATE.team1.name = team;
+    TEAM_STATE.team1.players = data.players.slice(0, PLAYERS_PER_TEAM);
+    TEAM_STATE.team1.loaded = true;
+    TEAM_STATE.team1.loading = false;
+
+    console.log(
+      `  [TEAM 1] Clearing list (current: ${listElement.children.length})`
+    );
+    listElement.innerHTML = "";
+    console.log(
+      `  [TEAM 1] List cleared (now: ${listElement.children.length})`
+    );
+
+    const topPlayers = data.players.slice(0, PLAYERS_PER_TEAM);
+    console.log(`  [TEAM 1] Adding ${topPlayers.length} players to DOM...`);
+
+    topPlayers.forEach((player, index) => {
+      addPlayerToList(player, listElement, 1);
+      if (index === 0) console.log(`    First player added: ${player.name}`);
+    });
+
+    console.log(
+      `✅ [TEAM 1] DOM populated: ${listElement.children.length} players`
+    );
+    logDOMState("AFTER Team 1 load");
+    updatePlayerCounter(1);
+  } catch (error) {
+    console.error(`❌ [TEAM 1] Load failed:`, error);
+    TEAM_STATE.team1.loading = false;
+    showNotification(`Failed to load ${team}: ${error.message}`, "error");
+  }
+}
+
+// ============================================================================
+// LOAD TEAM 2
+// ============================================================================
+
+async function loadPlayersForTeam2(team) {
+  console.log(`\n📥 [TEAM 2] Starting load for: ${team}`);
+
+  const listElement = document.getElementById("team2-list");
+  if (!listElement) {
+    console.error("❌ [TEAM 2] team2-list not found!");
+    return;
+  }
+
+  console.log(
+    `  [TEAM 2] List element found, current children: ${listElement.children.length}`
+  );
+  TEAM_STATE.team2.loading = true;
+
+  try {
+    const response = await fetch(`/meta/players/${team}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = await response.json();
+    if (!data.success || !data.players) throw new Error("Invalid response");
+
+    console.log(`✅ [TEAM 2] Fetched ${data.players.length} players`);
+
+    // Update state
+    TEAM_STATE.team2.name = team;
+    TEAM_STATE.team2.players = data.players.slice(0, PLAYERS_PER_TEAM);
+    TEAM_STATE.team2.loaded = true;
+    TEAM_STATE.team2.loading = false;
+
+    console.log(
+      `  [TEAM 2] Clearing list (current: ${listElement.children.length})`
+    );
+    listElement.innerHTML = "";
+    console.log(
+      `  [TEAM 2] List cleared (now: ${listElement.children.length})`
+    );
+
+    const topPlayers = data.players.slice(0, PLAYERS_PER_TEAM);
+    console.log(`  [TEAM 2] Adding ${topPlayers.length} players to DOM...`);
+
+    topPlayers.forEach((player, index) => {
+      addPlayerToList(player, listElement, 2);
+      if (index === 0) console.log(`    First player added: ${player.name}`);
+    });
+
+    console.log(
+      `✅ [TEAM 2] DOM populated: ${listElement.children.length} players`
+    );
+    logDOMState("AFTER Team 2 load");
+    updatePlayerCounter(2);
+  } catch (error) {
+    console.error(`❌ [TEAM 2] Load failed:`, error);
+    TEAM_STATE.team2.loading = false;
+    showNotification(`Failed to load ${team}: ${error.message}`, "error");
+  }
+}
+
+// ============================================================================
+// ADD PLAYER TO LIST
+// ============================================================================
+
+function addPlayerToList(player, listElement, teamNumber) {
+  const playerCard = document.createElement("div");
+  playerCard.className =
+    "group relative bg-slate-900/50 border border-slate-800 rounded-lg p-3 hover:border-blue-500/50 transition-all";
+  playerCard.dataset.playerName = player.name;
+  playerCard.dataset.teamNumber = teamNumber;
+
+  const batOvr = player.bat_ovr
+    ? `<span class="text-blue-400">${player.bat_ovr}</span>`
+    : '<span class="text-slate-600">-</span>';
+  const bowlOvr = player.bowl_ovr
+    ? `<span class="text-red-400">${player.bowl_ovr}</span>`
+    : '<span class="text-slate-600">-</span>';
+
+  playerCard.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                    ${getCategoryBadge(player.category)}
+                    <span class="text-[11px] font-medium text-slate-200 truncate">${
+                      player.name
+                    }</span>
+                </div>
+                <div class="flex items-center gap-3 text-[10px]">
+                    <div class="flex items-center gap-1">
+                        <span class="text-slate-500">BAT</span>
+                        ${batOvr}
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-slate-500">BOWL</span>
+                        ${bowlOvr}
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-slate-500">OVR</span>
+                        <span class="text-emerald-400 font-semibold">${
+                          player.overall_ovr
+                        }</span>
+                    </div>
+                </div>
+            </div>
+            <button onclick="removePlayer(this)" 
+                    class="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-400 p-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    `;
+
+  listElement.appendChild(playerCard);
+}
+
+// ============================================================================
+// REMOVE PLAYER
+// ============================================================================
+
+function removePlayer(button) {
+  const playerCard = button.closest("[data-player-name]");
+  const playerName = playerCard.dataset.playerName;
+  const teamNumber = parseInt(playerCard.dataset.teamNumber);
+
+  console.log(`🗑️ Removing ${playerName} from Team ${teamNumber}`);
+  logDOMState("BEFORE remove");
+
+  playerCard.remove();
+
+  const stateKey = `team${teamNumber}`;
+  TEAM_STATE[stateKey].players = TEAM_STATE[stateKey].players.filter(
+    (p) => p.name !== playerName
+  );
+
+  logDOMState("AFTER remove");
+  updatePlayerCounter(teamNumber);
+}
+
+// ============================================================================
+// UPDATE COUNTER
+// ============================================================================
+
+function updatePlayerCounter(teamNumber) {
+  const listId = `team${teamNumber}-list`;
+  const counterId = `team${teamNumber}-count`;
+
+  const listElement = document.getElementById(listId);
+  const counterElement = document.getElementById(counterId);
+
+  if (listElement && counterElement) {
+    const count = listElement.children.length;
+    counterElement.textContent = count;
+
+    if (count === 11) {
+      counterElement.className = "text-green-400 font-bold";
+    } else if (count > 0) {
+      counterElement.className = "text-yellow-400 font-bold";
+    } else {
+      counterElement.className = "text-red-400 font-bold";
+    }
+  }
+}
+
+// ============================================================================
+// RUN PREDICTION
+// ============================================================================
+
 async function runPredictionEnhanced() {
-  const team1 = document.getElementById("team1-select").value;
-  const team2 = document.getElementById("team2-select").value;
+  console.log("\n🎯 Running prediction...");
+  logDOMState("BEFORE prediction");
 
-  // Get player names from lists
-  const team1Players = [...document.querySelectorAll("#team1-list > div")]
-    .map((div) => {
-      const nameSpan = div.querySelector(".text-slate-200");
-      return nameSpan ? nameSpan.textContent.trim() : "";
-    })
-    .filter((name) => name);
+  const team1Select = document.getElementById("team1-select");
+  const team2Select = document.getElementById("team2-select");
 
-  const team2Players = [...document.querySelectorAll("#team2-list > div")]
-    .map((div) => {
-      const nameSpan = div.querySelector(".text-slate-200");
-      return nameSpan ? nameSpan.textContent.trim() : "";
-    })
-    .filter((name) => name);
+  if (!team1Select || !team2Select) {
+    showNotification("Team selection not found", "error");
+    return;
+  }
 
-  console.log("Sending prediction request:", {
-    team1,
-    team2,
-    team1_players_count: team1Players.length,
-    team2_players_count: team2Players.length,
-  });
+  const team1 = team1Select.value;
+  const team2 = team2Select.value;
+
+  const team1List = document.getElementById("team1-list");
+  const team2List = document.getElementById("team2-list");
+
+  const team1Players = Array.from(team1List.children).map(
+    (card) => card.dataset.playerName
+  );
+  const team2Players = Array.from(team2List.children).map(
+    (card) => card.dataset.playerName
+  );
+
+  console.log(`📊 Team 1 (${team1}): ${team1Players.length} players`);
+  console.log(`📊 Team 2 (${team2}): ${team2Players.length} players`);
+
+  if (team1Players.length === 0 || team2Players.length === 0) {
+    showNotification("Both teams need players!", "error");
+    return;
+  }
+
+  const predictBtn = document.querySelector('[onclick*="runPrediction"]');
+  if (predictBtn) {
+    predictBtn.disabled = true;
+    predictBtn.textContent = "Predicting...";
+  }
 
   try {
     const response = await fetch("/api/predict", {
@@ -208,70 +420,128 @@ async function runPredictionEnhanced() {
       }),
     });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP ${response.status}`);
+    }
+
     const result = await response.json();
 
     if (!result.success) {
-      showNotification(result.error || "Prediction failed", "error");
-      return;
+      throw new Error(result.error || "Prediction failed");
     }
 
-    console.log("✅ Prediction result:", result);
-
-    // Update UI with results
+    console.log("✅ Prediction successful:", result);
     updateResultScreenEnhanced(result);
-
-    // Show success notification
-    showNotification(
-      `Prediction complete: ${result.winner} (${result.winner_prob}%)`,
-      "success"
-    );
-
-    // Go to results step
-    goToStep(3);
+    showStep(3);
+    showNotification("Prediction complete!", "success");
   } catch (error) {
-    console.error("Prediction error:", error);
-    showNotification("Failed to run prediction", "error");
+    console.error("❌ Prediction error:", error);
+    showNotification(`Prediction failed: ${error.message}`, "error");
+  } finally {
+    if (predictBtn) {
+      predictBtn.disabled = false;
+      predictBtn.textContent = "Run Prediction";
+    }
   }
 }
 
-/**
- * Update result screen with enhanced data
- */
+// ============================================================================
+// UPDATE RESULT SCREEN
+// ============================================================================
+
 function updateResultScreenEnhanced(result) {
-  // Update team names
-  const t1 = document.getElementById("result-team1");
-  const t2 = document.getElementById("result-team2");
-  if (t1) t1.textContent = result.team1;
-  if (t2) t2.textContent = result.team2;
+  const team1Name = document.getElementById("result-team1-name");
+  const team2Name = document.getElementById("result-team2-name");
+  if (team1Name) team1Name.textContent = result.team1;
+  if (team2Name) team2Name.textContent = result.team2;
 
-  // Update probabilities
-  const pA = document.getElementById("result-prob-a");
-  const pB = document.getElementById("result-prob-b");
-  if (pA)
-    pA.innerHTML = `${result.team1_prob.toFixed(
-      1
-    )}<span class="text-2xl text-emerald-400">%</span>`;
-  if (pB)
-    pB.innerHTML = `${result.team2_prob.toFixed(
-      1
-    )}<span class="text-2xl text-sky-400">%</span>`;
+  const team1Prob = document.getElementById("result-team1-prob");
+  const team2Prob = document.getElementById("result-team2-prob");
+  if (team1Prob) team1Prob.textContent = `${result.team1_prob}%`;
+  if (team2Prob) team2Prob.textContent = `${result.team2_prob}%`;
 
-  // Highlight winner
-  const leftCard = pA?.parentElement;
-  const rightCard = pB?.parentElement;
-
-  if (result.team1_prob > result.team2_prob) {
-    leftCard?.classList.add("from-emerald-500/25");
-    rightCard?.classList.remove("from-sky-500/15");
-  } else {
-    rightCard?.classList.add("from-sky-500/15");
-    leftCard?.classList.remove("from-emerald-500/25");
+  const winnerBadge = document.getElementById("winner-badge");
+  if (winnerBadge) {
+    winnerBadge.textContent = `${result.winner} wins`;
+    winnerBadge.className =
+      "px-4 py-2 bg-green-500/20 text-green-400 rounded-lg font-semibold";
   }
 
-  console.log("✅ Result screen updated");
+  const confidenceLevel = document.getElementById("confidence-level");
+  if (confidenceLevel) {
+    confidenceLevel.textContent = result.confidence.level;
+    confidenceLevel.style.color = result.confidence.color;
+  }
+
+  if (result.source_weights) {
+    const ovrWeight = document.getElementById("weight-ovr");
+    const h2hWeight = document.getElementById("weight-h2h");
+    const formWeight = document.getElementById("weight-form");
+    const pvpWeight = document.getElementById("weight-pvp");
+
+    if (ovrWeight) ovrWeight.textContent = `${result.source_weights.ovr}%`;
+    if (h2hWeight) h2hWeight.textContent = `${result.source_weights.h2h}%`;
+    if (formWeight) formWeight.textContent = `${result.source_weights.form}%`;
+    if (pvpWeight) pvpWeight.textContent = `${result.source_weights.pvp}%`;
+  }
+
+  console.log("✅ Results UI updated");
 }
 
-// Override the original runPrediction function
-window.runPrediction = runPredictionEnhanced;
+// ============================================================================
+// INITIALIZE
+// ============================================================================
 
-console.log("✅ Enhanced player auto-population loaded");
+document.addEventListener("DOMContentLoaded", function () {
+  console.log("\n🎬 ULTRA-DEBUG: Initializing...");
+  logDOMState("Initial state");
+
+  const team1Select = document.getElementById("team1-select");
+  const team2Select = document.getElementById("team2-select");
+
+  if (!team1Select || !team2Select) {
+    console.error("❌ Team select elements not found");
+    return;
+  }
+
+  // Set defaults
+  if (!team1Select.value) team1Select.value = DEFAULT_TEAM_1;
+  if (!team2Select.value) team2Select.value = DEFAULT_TEAM_2;
+
+  console.log(`  Default Team 1: ${team1Select.value}`);
+  console.log(`  Default Team 2: ${team2Select.value}`);
+
+  // Load with delay
+  setTimeout(() => {
+    console.log(`🚀 Loading Team 1: ${team1Select.value}`);
+    loadPlayersForTeam1(team1Select.value);
+  }, 100);
+
+  setTimeout(() => {
+    console.log(`🚀 Loading Team 2: ${team2Select.value}`);
+    loadPlayersForTeam2(team2Select.value);
+  }, 300);
+
+  // Attach listeners
+  team1Select.addEventListener("change", handleTeam1Change);
+  team2Select.addEventListener("change", handleTeam2Change);
+
+  console.log("✅ Event listeners attached");
+  console.log("✅ ULTRA-DEBUG initialization complete");
+});
+
+// ============================================================================
+// EXPOSE GLOBALLY
+// ============================================================================
+
+window.removePlayer = removePlayer;
+window.runPredictionEnhanced = runPredictionEnhanced;
+window.handleTeam1Change = handleTeam1Change;
+window.handleTeam2Change = handleTeam2Change;
+window.logDOMState = logDOMState;
+window.TEAM_STATE = TEAM_STATE;
+
+console.log(
+  "✅ ULTRA-DEBUG VERSION LOADED - Type logDOMState('manual check') to inspect"
+);
