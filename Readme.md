@@ -1,4 +1,4 @@
-# 🏏 Deep IPL Predictor
+# 🏏 Deep Neural Net IPL Predictor
 
 ### Multi-Modal Win & Playoff Forecasting for the Indian Premier League
 
@@ -495,4 +495,4 @@ Framework built with [PyTorch](https://pytorch.org), [Flask](https://flask.palle
 
 ---
 
-_Built at USC · CSCI 566 Deep Learning · Spring 2025_
+_Built at USC · CSCI 566 Deep Learning · Fall 2025_
