@@ -5,17 +5,17 @@ import pandas as pd
 app = Flask(__name__)
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(BASE, "Nikhil/Dataset(s) and code/dataset/DL_MODELS"))
+sys.path.append(os.path.join(BASE, "data_forge/dataset/DL_MODELS"))
 
 from ipl_match_predictor import Predictor, PlayerLookup, norm_team
 
 # Paths
-BATTING_OVR = f"{BASE}/Nikhil/Dataset(s) and code/dataset/OVR/PRE_OVR_BATTING_20251129_154628.csv"
-BOWLING_OVR = f"{BASE}/Nikhil/Dataset(s) and code/dataset/OVR/PRE_OVR_BOWLING_20251129_154628.csv"
-H2H_CSV = f"{BASE}/Nikhil/Dataset(s) and code/dataset/DL_MODELS/outputs/team_h2h_matrix_2025.csv"
-FORM_CSV = f"{BASE}/Nikhil/Dataset(s) and code/dataset/DL_MODELS/outputs/team_recent_form_2025.csv"
-PVP_JSON = f"{BASE}/Nikhil/Dataset(s) and code/dataset/DL_MODELS/outputs/pvp_nested_dict.json"
-MODEL_PATH = f"{BASE}/Nikhil/Dataset(s) and code/dataset/DL_MODELS/best_model.pt"
+BATTING_OVR = f"{BASE}/data_forge/dataset/OVR/PRE_OVR_BATTING_20251129_154628.csv"
+BOWLING_OVR = f"{BASE}/data_forge/dataset/OVR/PRE_OVR_BOWLING_20251129_154628.csv"
+H2H_CSV = f"{BASE}/data_forge/dataset/DL_MODELS/outputs/team_h2h_matrix_2025.csv"
+FORM_CSV = f"{BASE}/data_forge/dataset/DL_MODELS/outputs/team_recent_form_2025.csv"
+PVP_JSON = f"{BASE}/data_forge/dataset/DL_MODELS/outputs/pvp_nested_dict.json"
+MODEL_PATH = f"{BASE}/data_forge/dataset/DL_MODELS/best_model.pt"
 
 # Load data
 lookup = PlayerLookup(BATTING_OVR, BOWLING_OVR)
