@@ -28,12 +28,9 @@ The system combines three complementary engines:
 
 ---
 
-<details>
-<summary>📸 See prediction output</summary>
+## Demo
 
 ![Prediction Output](./demo/output.png)
-
-</details>
 
 ## Table of Contents
 
