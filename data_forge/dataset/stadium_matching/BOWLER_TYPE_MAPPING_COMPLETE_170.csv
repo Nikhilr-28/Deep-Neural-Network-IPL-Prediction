@@ -1,0 +1,171 @@
+Player_Name,Kaggle_Match_Name,Bowler_Type,Is_AllRounder,Confidence,Source
+Anshul Kamboj,Anshul Kamboj,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Deepak Hooda,Deepak Hooda,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Kamlesh Nagarkoti,Kamlesh Nagarkoti,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Khaleel Ahmed,Khaleel Ahmed,PACE,FALSE,HIGH,LLM_Knowledge
+Matheesha Pathirana,Matheesha Pathirana,PACE,FALSE,HIGH,LLM_Knowledge
+Mukesh Choudhary,Mukesh Choudhary,PACE,FALSE,HIGH,LLM_Knowledge
+Nathan Ellis,Nathan Ellis,PACE,FALSE,HIGH,LLM_Knowledge
+Noor Ahmad,Noor Ahmad,SPIN,FALSE,HIGH,LLM_Knowledge
+Rachin Ravindra,Rachin Ravindra,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Ravichandran Ashwin,Ravichandran Ashwin,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Ravindra Jadeja,Ravindra Jadeja,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Sam Curran,Sam Curran,MEDIUM_AR,TRUE,HIGH,LLM_Knowledge
+Shivam Dube,Shivam Dube,MEDIUM_AR,TRUE,HIGH,LLM_Knowledge
+Shreyas Gopal,Shreyas Gopal,SPIN,FALSE,HIGH,LLM_Knowledge
+Vijay Shankar,Vijay Shankar,MEDIUM_AR,TRUE,HIGH,LLM_Knowledge
+Axar Patel,Axar Patel,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Darshan Nalkande,Darshan Nalkande,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Dushmantha Chameera,Dushmantha Chameera,PACE,FALSE,HIGH,LLM_Knowledge
+Kuldeep Yadav,Kuldeep Yadav,SPIN,FALSE,HIGH,LLM_Knowledge
+Mitchell Starc,Mitchell Starc,PACE,FALSE,HIGH,LLM_Knowledge
+Mohit Sharma,Mohit Sharma,PACE,FALSE,HIGH,LLM_Knowledge
+Mukesh Kumar,Mukesh Kumar,PACE,FALSE,HIGH,LLM_Knowledge
+Mustafizur Rahman,Mustafizur Rahman,PACE,FALSE,HIGH,LLM_Knowledge
+T Natarajan,T Natarajan,PACE,FALSE,HIGH,LLM_Knowledge
+Arshad Khan,Arshad Khan,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Gerald Coetzee,Gerald Coetzee,PACE,FALSE,HIGH,LLM_Knowledge
+Gurnoor Brar,Gurnoor Brar,PACE,FALSE,HIGH,LLM_Knowledge
+Ishant Sharma,Ishant Sharma,PACE,FALSE,HIGH,LLM_Knowledge
+Jayant Yadav,Jayant Yadav,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Kagiso Rabada,Kagiso Rabada,PACE,FALSE,HIGH,LLM_Knowledge
+Kulwant Khejroliya,Kulwant Khejroliya,PACE,FALSE,HIGH,LLM_Knowledge
+M Shahrukh Khan,M Shahrukh Khan,MEDIUM_AR,TRUE,HIGH,LLM_Knowledge
+Mahipal Lomror,Mahipal Lomror,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Manav Suthar,Manav Suthar,SPIN,FALSE,HIGH,LLM_Knowledge
+Mohammed Siraj,Mohammed Siraj,PACE,FALSE,HIGH,LLM_Knowledge
+Prasidh Krishna,Prasidh Krishna,PACE,FALSE,HIGH,LLM_Knowledge
+Rahul Tewatia,Rahul Tewatia,SPIN,FALSE,HIGH,LLM_Knowledge
+Rashid Khan,Rashid Khan,SPIN,FALSE,HIGH,LLM_Knowledge
+Sai Kishore,Sai Kishore,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Washington Sundar,Washington Sundar,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Andre Russell,Andre Russell,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Anrich Nortje,Anrich Nortje,PACE,FALSE,HIGH,LLM_Knowledge
+Anukul Roy,Anukul Roy,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Chetan Sakariya,Chetan Sakariya,PACE,FALSE,HIGH,LLM_Knowledge
+Harshit Rana,Harshit Rana,PACE,FALSE,HIGH,LLM_Knowledge
+Mayank Markande,Mayank Markande,SPIN,FALSE,HIGH,LLM_Knowledge
+Moeen Ali,Moeen Ali,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Ramandeep Singh,Ramandeep Singh,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Spencer Johnson,Spencer Johnson,PACE,FALSE,HIGH,LLM_Knowledge
+Sunil Narine,Sunil Narine,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Umran Malik,Umran Malik,PACE,FALSE,HIGH,LLM_Knowledge
+Vaibhav Arora,Vaibhav Arora,PACE,FALSE,HIGH,LLM_Knowledge
+Varun Chakravarthy,Varun Chakravarthy,SPIN,FALSE,HIGH,LLM_Knowledge
+Venkatesh Iyer,Venkatesh Iyer,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Abdul Samad,Abdul Samad,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Akash Deep,Akash Deep,PACE,FALSE,HIGH,LLM_Knowledge
+Akash Singh,Akash Singh,PACE,FALSE,HIGH,LLM_Knowledge
+Avesh Khan,Avesh Khan,PACE,FALSE,HIGH,LLM_Knowledge
+Ayush Badoni,Ayush Badoni,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+M Siddharth,M Siddharth,SPIN,FALSE,HIGH,LLM_Knowledge
+Mitchell Marsh,Mitchell Marsh,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Mohsin Khan,Mohsin Khan,PACE,FALSE,HIGH,LLM_Knowledge
+Rajvardhan Hangargekar,Rajvardhan Hangargekar,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Ravi Bishnoi,Ravi Bishnoi,SPIN,FALSE,HIGH,LLM_Knowledge
+Shahbaz Ahmed,Shahbaz Ahmed,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Shamar Joseph,Shamar Joseph,PACE,FALSE,HIGH,LLM_Knowledge
+Shardul Thakur,Shardul Thakur,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Arjun Tendulkar,Arjun Tendulkar,PACE,FALSE,HIGH,LLM_Knowledge
+Deepak Chahar,Deepak Chahar,PACE,FALSE,HIGH,LLM_Knowledge
+Hardik Pandya,Hardik Pandya,MEDIUM_AR,TRUE,HIGH,LLM_Knowledge
+Jasprit Bumrah,Jasprit Bumrah,PACE,FALSE,HIGH,LLM_Knowledge
+Karn Sharma,Karn Sharma,SPIN,FALSE,HIGH,LLM_Knowledge
+Lizaad Williams,Lizaad Williams,PACE,FALSE,HIGH,LLM_Knowledge
+Mitchell Santner,Mitchell Santner,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Naman Dhir,Naman Dhir,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Reece Topley,Reece Topley,PACE,FALSE,HIGH,LLM_Knowledge
+Richard Gleeson,Richard Gleeson,PACE,FALSE,HIGH,LLM_Knowledge
+Trent Boult,Trent Boult,PACE,FALSE,HIGH,LLM_Knowledge
+Will Jacks,Will Jacks,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Bhuvneshwar Kumar,Bhuvneshwar Kumar,PACE,FALSE,HIGH,LLM_Knowledge
+Josh Hazlewood,Josh Hazlewood,PACE,FALSE,HIGH,LLM_Knowledge
+Krunal Pandya,Krunal Pandya,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Liam Livingstone,Liam Livingstone,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Mohit Rathee,Mohit Rathee,PACE,FALSE,HIGH,LLM_Knowledge
+Nuwan Thushara,Nuwan Thushara,PACE,FALSE,HIGH,LLM_Knowledge
+Rasikh Salam,Rasikh Salam,PACE,FALSE,HIGH,LLM_Knowledge
+Romario Shepherd,Romario Shepherd,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Suyash Sharma,Suyash Sharma,SPIN,FALSE,HIGH,LLM_Knowledge
+Swapnil Singh,Swapnil Singh,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Yash Dayal,Yash Dayal,PACE,FALSE,HIGH,LLM_Knowledge
+Akash Madhwal,Akash Madhwal,PACE,FALSE,HIGH,LLM_Knowledge
+Fazalhaq Farooqi,Fazalhaq Farooqi,PACE,FALSE,HIGH,LLM_Knowledge
+Jofra Archer,Jofra Archer,PACE,FALSE,HIGH,LLM_Knowledge
+Kumar Kartikeya,Kumar Kartikeya,SPIN,FALSE,HIGH,LLM_Knowledge
+Kwena Maphaka,Kwena Maphaka,PACE,FALSE,HIGH,LLM_Knowledge
+Maheesh Theekshana,Maheesh Theekshana,SPIN,FALSE,HIGH,LLM_Knowledge
+Nandre Burger,Nandre Burger,PACE,FALSE,HIGH,LLM_Knowledge
+Nitish Rana,Nitish Rana,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Sandeep Sharma,Sandeep Sharma,PACE,FALSE,HIGH,LLM_Knowledge
+Tushar Deshpande,Tushar Deshpande,PACE,FALSE,HIGH,LLM_Knowledge
+Wanindu Hasaranga,Wanindu Hasaranga,SPIN,FALSE,HIGH,LLM_Knowledge
+Yudhvir Singh,Yudhvir Singh,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Abhishek Sharma,Abhishek Sharma,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Adam Zampa,Adam Zampa,SPIN,FALSE,HIGH,LLM_Knowledge
+Harshal Patel,Harshal Patel,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Jaydev Unadkat,Jaydev Unadkat,PACE,FALSE,HIGH,LLM_Knowledge
+Mohammed Shami,Mohammed Shami,PACE,FALSE,HIGH,LLM_Knowledge
+Nitish Kumar Reddy,Nitish Kumar Reddy,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Pat Cummins,Pat Cummins,PACE,FALSE,HIGH,LLM_Knowledge
+Rahul Chahar,Rahul Chahar,SPIN,FALSE,HIGH,LLM_Knowledge
+Simarjeet Singh,Simarjeet Singh,PACE,FALSE,HIGH,LLM_Knowledge
+Arshdeep Singh,Arshdeep Singh,PACE,FALSE,HIGH,LLM_Knowledge
+Azmatullah Omarzai,Azmatullah Omarzai,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Glenn Maxwell,Glenn Maxwell,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Harpreet Brar,Harpreet Brar,SPIN,FALSE,HIGH,LLM_Knowledge
+Kuldeep Sen,Kuldeep Sen,PACE,FALSE,HIGH,LLM_Knowledge
+Kyle Jamieson,Kyle Jamieson,PACE,FALSE,HIGH,LLM_Knowledge
+Lockie Ferguson,Lockie Ferguson,PACE,FALSE,HIGH,LLM_Knowledge
+Marco Jansen,Marco Jansen,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Marcus Stoinis,Marcus Stoinis,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Praveen Dubey,Praveen Dubey,SPIN,FALSE,HIGH,LLM_Knowledge
+Vijaykumar Vyshak,Vijaykumar Vyshak,PACE,FALSE,HIGH,LLM_Knowledge
+Yash Thakur,Yash Thakur,PACE,FALSE,HIGH,LLM_Knowledge
+Yuzvendra Chahal,Yuzvendra Chahal,SPIN,FALSE,HIGH,LLM_Knowledge
+Gurjapneet Singh,,PACE,FALSE,HIGH,LLM_Knowledge
+Jamie Overton,,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Ramakrishna Ghosh,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Ajay Mandal,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Ashutosh Sharma,,MEDIUM_AR,TRUE,HIGH,LLM_Knowledge
+Madhav Tiwari,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Manvanth Kumar,,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Sameer Rizvi,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Tripurana Vijay,,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Vipraj Nigam,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Dasun Shanaka,,MEDIUM_AR,TRUE,HIGH,LLM_Knowledge
+Karim Janat,,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Nishant Sindhu,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Sai Sudharsan,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Shivam Shukla,,PACE,FALSE,HIGH,LLM_Knowledge
+Arshin Kulkarni,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Digvesh Singh,,PACE,FALSE,HIGH,LLM_Knowledge
+Prince Yadav,,SPIN,FALSE,HIGH,LLM_Knowledge
+William O'Rourke,,PACE,FALSE,HIGH,LLM_Knowledge
+Yuvraj Chaudhary,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Allah Ghazanfar,,SPIN,FALSE,HIGH,LLM_Knowledge
+Ashwani Kumar,,PACE,FALSE,HIGH,LLM_Knowledge
+Charith Asalanka,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Mujeeb-ur-Rahman,,SPIN,FALSE,HIGH,LLM_Knowledge
+Raghu Sharma,,PACE,FALSE,HIGH,LLM_Knowledge
+Raj Bawa,,PACE_AR,TRUE,HIGH,LLM_Knowledge
+V Satyanarayana Penmetsa,,PACE,FALSE,HIGH,LLM_Knowledge
+Vignesh Puthur,,PACE,FALSE,HIGH,LLM_Knowledge
+Abhinandan Singh,,PACE,FALSE,HIGH,LLM_Knowledge
+Blessing Muzarabani,,PACE,FALSE,HIGH,LLM_Knowledge
+Jacob Bethell,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Lungisani Ngidi,,PACE,FALSE,HIGH,LLM_Knowledge
+Manoj Bhandage,,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Tim David,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Ashok Sharma,,SPIN,FALSE,HIGH,LLM_Knowledge
+Brydon Carse,,PACE,FALSE,HIGH,LLM_Knowledge
+Eshan Malinga,,PACE,FALSE,HIGH,LLM_Knowledge
+Harsh Dubey,,SPIN,FALSE,HIGH,LLM_Knowledge
+Kamindu Mendis,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Wiaan Mulder,,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Zeeshan Ansari,,SPIN,FALSE,HIGH,LLM_Knowledge
+Aaron Hardie,,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Musheer Khan,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Priyansh Arya,,SPIN_AR,TRUE,HIGH,LLM_Knowledge
+Suryansh Shedge,,PACE_AR,TRUE,HIGH,LLM_Knowledge
+Xavier Bartlett,,PACE,FALSE,HIGH,LLM_Knowledge
