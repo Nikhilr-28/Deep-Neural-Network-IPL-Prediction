@@ -478,7 +478,7 @@ If you use this work in your research, please cite:
 @article{ravichandran2025deepipl,
   title     = {Deep Learning for IPL Match Outcome and Playoff Prediction:
                A Multi-Modal Approach Using Dynamic Player Ratings and Environmental Factors},
-  author    = {Ravichandran, Nikhil and NV, Gaurav and Sonawane, Atharva},
+  author    = {Nikhil Ravichandram, NV Gaurav, Atharva Sonawane},
   institution = {University of Southern California},
   year      = {2025},
   note      = {CSCI 566 Final Project}
