@@ -177,8 +177,8 @@ deep-ipl-predictor/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your-org>/deep-ipl-predictor.git
-cd deep-ipl-predictor
+git clone https://github.com/Nikhilr-28/Deep-Neural-Network-IPL-Prediction.git
+cd Deep-Neural-Network-IPL-Prediction
 ```
 
 ### 2. Create a virtual environment
